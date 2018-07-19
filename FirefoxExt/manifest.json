@@ -1,0 +1,20 @@
+{
+    "name": "¿Dónde Están Mis Cupos?",
+    "version": "1.0",
+    "description": "Cupos de tus materias elegidas en banner",
+    "icons": {
+      "128":"icons/icon128.png",
+      "48":"icons/icon48.png"
+    },
+    "browser_action": {
+        "default_icon": "icons/icon48.png",
+        "default_title": "¿Dónde Están Mis Cupos?",
+        "default_popup": "popup/popup.html"
+    },
+    "applications": {
+      "gecko": {
+        "id": "cupos@ggitapps.com"
+      }
+    },
+    "manifest_version": 2
+  }
