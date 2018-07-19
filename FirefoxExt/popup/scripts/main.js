@@ -1,40 +1,29 @@
-function refresh()
-{
-
-}
-function start()
-{
-  let cards = document.querySelectorAll(".card");
-  changeAnimation(cards);
-  setTimeout(()=>{
-    location.href = "plans/plans.html";
-  }, 800);
-  console.log("CAMILO");
-}
 function changeAnimation(components)
 {
   components.forEach((comp)=>{
-    comp.classList.remove("slideInRight");
+    let content = document.querySelector(".card");
+    comp.classList.remove("fadeInRight");
     comp.classList.remove("animated");
 
-    comp.classList.add("slideOutLeft");
+    comp.classList.add("fadeOutLeft");
     comp.classList.add("animated");
   });
+  console.log("ANIMATION CHANGES");
 }
-// let links = document.querySelectorAll(".start");
-//
-// links.forEach((link)=>{
-//   link.addEventListener('click', (ev)=>{
-//     ev.preventDefault();
-//     let content = document.querySelector(".card");
-//     comp.classList.remove("slideInRight");
-//     comp.classList.remove("animated");
-//
-//     comp.classList.add("slideOutLeft");
-//     comp.classList.add("animated");
-//
-//     setTimeout(()=>{
-//       location.href = "plans/plans.html";
-//     }, 550);
-//   });
-// });
+
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("start")) {
+    var comps = document.querySelectorAll(".card");
+    changeAnimation(comps);
+
+    setTimeout(()=>{
+      try {
+        location.href = "plans/plans.html";
+        console.log("LOCATION CHANGES");
+      } catch (e) {
+        console.log(e.toString());
+        console.log("LOCATION ERROR");
+      }
+    }, 700);
+  }
+});
