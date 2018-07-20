@@ -1,15 +1,15 @@
 {
-    "name": "DondeEstanMisCupos",
+    "name": "¿Dónde Están Mis Cupos?",
     "version": "1.0",
-    "description": "Cupos en banner para tus materias",
+    "description": "Cupos de tus materias elegidas en banner",
     "icons": {
-      "128":"icon128.png",
-      "48":"icon48.png",
-      "16":"icon16.png"
+      "128":"icons/icon128.png",
+      "48":"icons/icon48.png"
     },
     "browser_action": {
-        "default_icon": "icon48.png",
-        "default_popup": "popup.html" 
+        "default_icon": "icons/icon48.png",
+        "default_title": "¿Dónde Están Mis Cupos?",
+        "default_popup": "popup/popup.html" 
     },
     "manifest_version": 2
   }
