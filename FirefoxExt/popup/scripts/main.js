@@ -68,15 +68,16 @@ document.addEventListener("click", (e) => {
   {
     let butRef = document.querySelectorAll(".refresh");
     let active = document.querySelectorAll(".accept");
-    active.push(document.querySelectorAll(".add-h"));
+    let add_h = document.querySelectorAll(".add-h");
 
     changeAnimationButtons(active, false);
+    changeAnimationButtons(add_h, false);
     changeAnimationButtons(butRef, true);
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
   }
   else if(e.target.classList.contains("add-h"))
   {
-
+    let actualHorario = document.getElementById();
   }
 });

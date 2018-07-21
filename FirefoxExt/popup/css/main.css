@@ -177,7 +177,7 @@ header h1{
 .add-h{
   position: fixed;
   bottom: 60px;
-  left: 15px;
+  margin: auto;
   border: none;
   height: 35px;
   width: 35px;
@@ -223,7 +223,7 @@ header h1{
 .add-m:active{
   color:rgb(43, 108, 194);
 }
-.add-m .fa-plus-circle{
+.add-m .fa-cart-arrow-down{
   padding-right: 5px
 }
 
