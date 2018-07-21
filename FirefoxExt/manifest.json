@@ -11,6 +11,9 @@
         "default_title": "¿Dónde Están Mis Cupos?",
         "default_popup": "popup/popup.html"
     },
+    "permissions": [
+      "activeTab"
+    ],
     "applications": {
       "gecko": {
         "id": "cupos@ggitapps.com"
