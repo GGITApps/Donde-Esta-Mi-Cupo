@@ -173,6 +173,59 @@ header h1{
   color:rgb(43, 108, 194);
 }
 
+/*BOTON ADD HORARIO*/
+.add-h{
+  position: fixed;
+  bottom: 60px;
+  left: 15px;
+  border: none;
+  height: 35px;
+  width: 35px;
+  color: white;
+  background-color: #2DA839;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.add-h:hover{
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.add-h:active{
+  color:rgb(43, 108, 194);
+}
+
+/*BOTON ADD MATERIA*/
+.add-m{
+  margin: auto;
+  border: none;
+  font-family: 'Raleway';
+  font-size: 1em;
+  height: 35px;
+  width: 90px;
+  color: white;
+  background-color: #2DA839;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.add-m:hover{
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.add-m:active{
+  color:rgb(43, 108, 194);
+}
+.add-m .fa-plus-circle{
+  padding-right: 5px
+}
 
 .display-none{
   display:none;

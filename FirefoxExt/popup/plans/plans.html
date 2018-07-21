@@ -23,18 +23,25 @@
         </div>
         <div class="card margin-top animated fadeInRight">
           <h4>Horario 1</h4>
-          <p class="welcome">HOLA LOKS SIRVE</p>
-        </div>
-        <div class="card margin-top animated fadeInRight">
-          <h4>Horario 2</h4>
-          <p class="welcome">COMO ESTAS LOK</p>
-        </div>
-        <div class="card margin-top animated fadeInRight">
-          <h4>Horario 3</h4>
-          <p class="welcome">ESPERO QUE BIEN</p>
+          <table class="opc-horario">
+            <thead>
+              <th>Materia</th>
+              <th>Código</th>
+              <th>NRC</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" name="materia" class="materia"></td>
+                <td><input type="text" name="código" class="codigo"></td>
+                <td><input type="text" name="NRC" class="nrc"></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" name="Añadir materia" class="add-m"><i class="fas fa-plus-circle"></i>Añadir Materia</button>
         </div>
       </div>
       <button type="button" name="Refrescar" class="refresh display-none"><i class="fas fa-sync-alt"></i></button>
+      <button type="button" name="Añadir horario" class="add-h animated zoomIn"><i class="fas fa-plus"></i></button>
       <button type="button" name="Aceptar" class="accept animated zoomIn"><i class="fas fa-check"></i></button>
     </div>
     <footer>&copy; GGITApps - Todos los derechos reservados</footer>
