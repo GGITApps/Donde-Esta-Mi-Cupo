@@ -25,6 +25,24 @@ var html_horario = (num) =>{
     </div>
   </div>`};
 
+/*OBJETOS*/
+function Materia(nombre, prefijo, nrc)
+{
+  this.nombre = nombre;
+  this.prefijo = prefijo;
+  this.nrc = nrc;
+}
+function Horario(materias)
+{
+  this.cantidadMaterias = materias.length;
+  this.materias = materias;
+}
+function Horarios(horarios)
+{
+  this.cantidadHorarios = horarios.length;
+  this.horarios = horarios;
+}
+
 /*
 Función que cambia la animación de las tarjetas SOLAMENTE
 */
@@ -129,6 +147,25 @@ document.addEventListener("click", (e) => {
         console.log("LOCATION CHANGES");
     }, 700);
   }
+  else if(e.target.classList.contains("search"))
+  {
+    let cards = document.querySelectorAll(".card");
+    changeAnimationCards(cards);
+
+    setTimeout(()=>{
+        location.href = "redirect/search.html";
+        console.log("LOCATION CHANGES");
+    }, 700);
+
+  }
+  else if(e.target.classList.contains("last"))
+  {
+    //FALTA LOGICA
+  }
+  else if(e.target.classList.contains("search-action"))
+  {
+    //FALTA LOGICA
+  }
   else if(e.target.classList.contains("back"))
   {
     let loc = location.href;
@@ -147,8 +184,10 @@ document.addEventListener("click", (e) => {
     else if(loc.includes("search"))
     {
       let cards = document.querySelectorAll(".card");
+      let cards2 = document.querySelectorAll(".card-s");
       let butts = document.querySelectorAll("button.animated");
       changeAnimationCards(cards);
+      changeAnimationCards(cards2);
       changeAnimationButtons(butts, false);
 
       setTimeout(()=>{
@@ -182,6 +221,8 @@ document.addEventListener("click", (e) => {
     changeAnimationButtons(butRef, true);
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
+    //FALTA LOGICA
+
   }
   else if(e.target.classList.contains("add-h"))
   {

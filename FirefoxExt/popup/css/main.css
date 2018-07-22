@@ -93,6 +93,66 @@ header h1{
   text-align: justify;
 }
 
+.card-s{
+  max-width: 480px;
+  margin: 10px auto;
+  width: 80vw;
+  height: 36px;
+  z-index: 1;
+  background-color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 12px;
+  border-top-right-radius: 45%;
+  border-bottom-right-radius: 45%;
+}
+.card-s #pr{
+  border: 0;
+  font-size: 1em;
+  height: inherit;
+  border-radius: 12px;
+  padding: 0 8px;
+  width: 45px;
+  display: inline-block;
+  text-align: center;
+  border-right: 1px #2DA839 solid;
+}
+.card-s input{
+  border: 0;
+  font-size: 1em;
+  height: inherit;
+  border-radius: 12px;
+  padding: 0 36px 0 8px;
+  display: inline-block;
+  width: 400px;
+  border-left: 1px #2DA839 solid;
+}
+.search-action{
+  position: absolute;
+  right: -5px;
+  top: 0;
+  bottom: 0;
+  border: none;
+  height: 33px;
+  width: 33px;
+  color: white;
+  background-color: #2DA839;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.search-action:hover{
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.search-action:active{
+  color:rgb(43, 108, 194);
+}
+
+
 /*_____INICIO______*/
 /*BOTON START*/
 .start{
@@ -234,7 +294,7 @@ header h1{
 /*BOTON BACK*/
 .back{
   position: fixed;
-  top: 80px;
+  top: 84px;
   left: 15px;
   border: none;
   height: 33px;
