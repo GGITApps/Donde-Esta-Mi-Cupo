@@ -100,10 +100,7 @@ header h1{
   height: 36px;
   z-index: 1;
   background-color: white;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   border-radius: 12px;
-  border-top-right-radius: 45%;
-  border-bottom-right-radius: 45%;
 }
 .card-s #pr{
   border: 0;
@@ -114,7 +111,7 @@ header h1{
   width: 45px;
   display: inline-block;
   text-align: center;
-  border-right: 1px #2DA839 solid;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 .card-s input{
   border: 0;
@@ -123,14 +120,16 @@ header h1{
   border-radius: 12px;
   padding: 0 36px 0 8px;
   display: inline-block;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   width: 400px;
-  border-left: 1px #2DA839 solid;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  /*border-left: 1px #2DA839 solid;*/
 }
 .search-action{
   position: absolute;
-  right: -5px;
-  top: 0;
-  bottom: 0;
+  right: 4.5px;
+  bottom: .5px;
   border: none;
   height: 33px;
   width: 33px;

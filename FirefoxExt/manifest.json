@@ -12,7 +12,9 @@
         "default_popup": "popup/popup.html"
     },
     "permissions": [
-      "activeTab"
+      "activeTab",
+      "<all_urls>",
+      "webRequest"
     ],
     "applications": {
       "gecko": {

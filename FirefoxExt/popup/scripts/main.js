@@ -222,6 +222,21 @@ document.addEventListener("click", (e) => {
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
     //FALTA LOGICA
+    var misCabeceras = new Headers();
+
+    var miInit = { method: 'GET',
+                  headers: misCabeceras,
+                  mode: 'cors',
+                  cache: 'default' };
+
+    fetch('flores.jpg',miInit)
+    .then(function(response) {
+      return response.blob();
+    })
+    .then(function(miBlob) {
+      var objectURL = URL.createObjectURL(miBlob);
+      miImagen.src = objectURL;
+    });
 
   }
   else if(e.target.classList.contains("add-h"))
