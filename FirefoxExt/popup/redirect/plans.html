@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <title>¿Dónde Están Mis Cupos?</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,700">
+    <link rel="stylesheet" href="../fonts/font-awesome/css/fontawesome-all.css">
+    <link rel="stylesheet" href="../css/animate.css">
+    <script src="../scripts/main.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <img class="logo" src="../../icons/icon.svg" alt="logo">
+        <h1>¿Dónde Están Mis Cupos?</h1>
+      </header>
+      <button type="button" name="Atrás" class="back animated zoomIn"><i class="fas fa-arrow-left"></i></button>
+      <div class="content">
+        <div class="card animated fadeInRight">
+          <h3>¡ Comencemos !</h3>
+          <p class="welcome">Agrega cada una de tus materias para mirar los cupos restantes de estas.</p>
+          <p class="welcome">Debes llenar todos los campos de cada materia, por ejemplo: (nombre -> APO), (código -> ISIS-1204), (NRC -> 44444)</p>
+          <p class="welcome"><strong>Recuerda...</strong><br>separa el código con un "-" como en el ejemplo anterior</p>
+          <p class="welcome">También si lo prefieres puedes añadir ¡hasta 5 opciones de horario!</p>
+        </div>
+        <div class="card default margin-top animated fadeInRight">
+          <h4>Horario 1</h4>
+          <table class="opc-horario">
+            <thead>
+              <th>Materia</th>
+              <th>Código</th>
+              <th>NRC</th>
+            </thead>
+            <tbody id="tb1">
+              <tr>
+                <td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td>
+                <td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td>
+                <td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="align-but">
+            <button type="button" name="Añadir materia" class="add-m" value="tb1"><i class="fas fa-plus"></i>Añadir Materia</button>
+            <button type="button" name="Quitar última" class="remove-m" value="tb1"><i class="fas fa-eraser"></i>Quitar Materia</button>
+          </div>
+        </div>
+      </div>
+      <div class="align-but">
+        <button type="button" name="Añadir horario" class="add-h animated zoomIn"><i class="fas fa-plus"></i></button>
+        <button type="button" name="Quitar horario" class="remove-h animated zoomIn"><i class="fas fa-minus"></i></button>
+      </div>
+      <button type="button" name="Refrescar" class="refresh display-none"><i class="fas fa-sync-alt"></i></button>
+      <button type="button" name="Aceptar" class="accept animated zoomIn"><i class="fas fa-check"></i></button>
+    </div>
+    <footer>&copy; GGITApps - Todos los derechos reservados</footer>
+  </body>
+</html>
