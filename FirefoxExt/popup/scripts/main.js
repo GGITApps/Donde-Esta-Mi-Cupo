@@ -235,7 +235,7 @@ document.addEventListener("click", (e) => {
         alert("MAL TODO PRRON")
       }
       //access your JSON file through the variable "json"
-
+      //ALGO LE PASA A ESTO PRRON
     });
 
   }
