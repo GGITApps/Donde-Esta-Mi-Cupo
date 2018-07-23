@@ -13,8 +13,11 @@
     },
     "permissions": [
       "activeTab",
-      "<all_urls>",
-      "webRequest"
+      "notifications"
+    ],
+    "web_accessible_resources": [
+      "data/cursos.json",
+      "data/cupos.json"
     ],
     "applications": {
       "gecko": {

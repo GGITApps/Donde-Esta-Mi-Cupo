@@ -222,20 +222,20 @@ document.addEventListener("click", (e) => {
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
     //FALTA LOGICA
-    var misCabeceras = new Headers();
+    $.getJSON(browser.extension.getURL("data/cursos.json"), function(json) {
+      var msj = "IMPRIME";
+      alert("DENTRO");
+      try {   
+        for(let x of json)
+        {
+          msj += " " + Object.value(x)[0];
+        }
+        alert("BIEN TODO PRRON");
+      } catch (e) {
+        alert("MAL TODO PRRON")
+      }
+      //access your JSON file through the variable "json"
 
-    var miInit = { method: 'GET',
-                  headers: misCabeceras,
-                  mode: 'cors',
-                  cache: 'default' };
-
-    fetch('flores.jpg',miInit)
-    .then(function(response) {
-      return response.blob();
-    })
-    .then(function(miBlob) {
-      var objectURL = URL.createObjectURL(miBlob);
-      miImagen.src = objectURL;
     });
 
   }

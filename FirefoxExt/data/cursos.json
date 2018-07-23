@@ -1,9 +1,9 @@
 [
-    {"1":"ADMI"},
+    {"1":"ADMI"},//ERROR
     {"2":"ANTR"},
     {"3":"ARQU"},
-    {"4":"ARTE"},
-    {"5":"BIOL"},
+    {"4":"ARTE"},//ERROR
+    {"5":"BIOL"},//ERROR
     {"6":"CBCA"},
     {"7":"CBCC"},
     {"8":"CBCO"},
@@ -21,11 +21,11 @@
     {"20":"EGOB"},
     {"21":"FARH"},
     {"22":"FILO"},
-    {"23":"FISI"},
+    {"23":"FISI"},//ERROR
     {"24":"GEOC"},
     {"25":"HART"},
     {"26":"HIST"},
-    {"27":"IBIO"},
+    {"27":"IBIO"},//ERROR
     {"28":"ICYA"},
     {"29":"IELE"},
     {"30":"IIND"},
@@ -36,11 +36,11 @@
     {"35":"ISIS"},
     {"36":"LENG"},
     {"37":"LITE"},
-    {"38":"MATE"},
+    {"38":"MATE"},//ERROR
     {"39":"MBIO"},
     {"40":"MEDI"},
-    {"41":"MUSI"},
+    {"41":"MUSI"},//ERROR
     {"42":"PERI"},
     {"43":"PSIC"},
-    {"44":"QUIM"}
+    {"44":"QUIM"}//ERROR
 ]
