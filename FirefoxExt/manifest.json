@@ -12,12 +12,10 @@
         "default_popup": "popup/popup.html"
     },
     "permissions": [
-      "activeTab",
-      "notifications"
+      "activeTab"
     ],
     "web_accessible_resources": [
-      "data/cursos.json",
-      "data/cupos.json"
+      "../data/cursos.json"
     ],
     "applications": {
       "gecko": {

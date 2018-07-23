@@ -37,11 +37,11 @@ function Horario(materias)
   this.cantidadMaterias = materias.length;
   this.materias = materias;
 }
-function Horarios(horarios)
+/* function Horarios(horarios)
 {
   this.cantidadHorarios = horarios.length;
   this.horarios = horarios;
-}
+} */
 
 /*
 Función que cambia la animación de las tarjetas SOLAMENTE
@@ -160,11 +160,23 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("last"))
   {
-    //FALTA LOGICA
+    var dir = browser.extension.getURL("../data/cupos.json");
+    var msj = "";
+    $.getJSON(dir, (json) => {
+      $.each( json, function( key, val ) {
+        msj += "(num: " + (key+1) + " val: " + Object.values(val)[0] + "), ";
+      });
+      alert(msj);
+    });
+    //FALTA LECTURA DEL JSON LOCAL
   }
   else if(e.target.classList.contains("search-action"))
   {
-    //FALTA LOGICA
+    let prefijo = document.getElementById("pr").value;
+    let busqueda = document.getElementById("busqueda").value;
+
+    //PETICION GET A CAMILO
+
   }
   else if(e.target.classList.contains("back"))
   {
@@ -222,22 +234,26 @@ document.addEventListener("click", (e) => {
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
     //FALTA LOGICA
-    $.getJSON(browser.extension.getURL("data/cursos.json"), function(json) {
-      var msj = "IMPRIME";
-      alert("DENTRO");
-      try {   
-        for(let x of json)
-        {
-          msj += " " + Object.value(x)[0];
-        }
-        alert("BIEN TODO PRRON");
-      } catch (e) {
-        alert("MAL TODO PRRON")
+    let horarios = document.querySelectorAll(".cuerpo");
+    var arrHorarios = [];
+    for(let h in horarios)
+    {
+      let materias = h.children;
+      let arrMaterias = [];
+      for(let m in materias)
+      {
+        let campos = m.children;
+        let nom = campos[0].input.text;
+        let pre = campos[1].input.text;
+        let cod = campos[2].input.text;
+        var oMateria = new Materia(nom, pre, cod);
+        arrMaterias.push(oMateria);
       }
-      //access your JSON file through the variable "json"
-      //ALGO LE PASA A ESTO PRRON
-    });
-
+      var oHorario = new Horario(arrMaterias);
+      arrHorarios.push(oHorario);
+    }
+    console.log(arrHorarios);
+    
   }
   else if(e.target.classList.contains("add-h"))
   {
