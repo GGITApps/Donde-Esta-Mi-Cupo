@@ -395,8 +395,8 @@ document.addEventListener("click", (e) => {
       tabla.innerHTML = html_cupos(numHorario);
       for(let ma of ho.materias)
       {
-        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+ma.codigo;
-        setTimeout(()=>{
+        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+(ma.codigo);
+        /* setTimeout(()=>{
           fetch(dir)
           .then(response => response.text())
           .then( rta =>{
@@ -437,7 +437,46 @@ document.addEventListener("click", (e) => {
             row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
             buscado.appendChild(row);
           });
-        }, 1000);
+        }, 1000); */
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', dir, true);
+        xhr.send();
+        xhr.onreadystatechange = processRequest;
+      
+        function processRequest(e) {
+          setTimeout(()=>{
+            var rta = xhr.responseText; 
+            if(rta == 'prefijo incorrecto')
+            {
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+              buscado.appendChild(row);
+            }
+            else if(rta.includes('["'))
+            {
+              var bus = rta.split(",")[0].split('"')[1];
+              var cant = rta.split(",")[1].split('"')[1];
+              var disp = rta.split(",")[2].split('"')[1];
+        
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+
+              let search = document.createElement("tr");
+              search.className = "card margin-top animated fadeInRight";
+              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp) ;
+              ma['capacidad'] = cant;
+              ma['disponible'] = disp;
+              buscado.appendChild(search);
+            }
+            else
+            {
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+              buscado.appendChild(row);
+            }
+          }, 1000);
+        }
       }
       tablas.push(tabla);
       numHorario++;
