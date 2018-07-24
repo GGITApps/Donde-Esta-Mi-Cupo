@@ -174,12 +174,12 @@ document.addEventListener("click", (e) => {
   {
     var dir = browser.extension.getURL("../data/cupos.json");
     var msj = "";
-    $.getJSON(dir, (json) => {
+    /* $.getJSON(dir, (json) => {
       $.each( json, function( key, val ) {
         msj += "(num: " + (key+1) + " val: " + Object.values(val)[0] + "), ";
       });
       
-    });
+    }); */
     //FALTA LECTURA DEL JSON LOCAL
   }
   else if(e.target.classList.contains("search-action"))
@@ -332,7 +332,8 @@ document.addEventListener("click", (e) => {
     for(let ho of arrHorarios)
     {
       let numHorario = 1;
-      let tabla = document.createElement();
+      let tabla = document.createElement("div");
+      tabla.className = "card default margin-top animated fadeInRight";
       for(let ma of ho.materias)
       {
         let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+ma.prefijo+"&nrc="+ma.codigo;

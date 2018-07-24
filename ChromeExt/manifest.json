@@ -11,5 +11,12 @@
         "default_title": "¿Dónde Están Mis Cupos?",
         "default_popup": "popup/popup.html" 
     },
+    "web_accessible_resources": [
+      "*://fonts.googleapis.com/*",
+      "../data/cursos.json"
+    ],
+    "permissions": [
+      "activeTab"
+    ],
     "manifest_version": 2
   }

@@ -1,5 +1,6 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
+var arrHorarios = [];
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
 var html_horario = (num) =>{
@@ -27,7 +28,7 @@ var html_horario = (num) =>{
 var html_busqueda = (prefijo, nrc, cap, disp) => {
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
-  if(porc == NaN)
+  if(porc == NaN || (cap == 0 && disp == 0))
     color = "rojo";
   else if(porc < 0.2)
     color = "rojo";
@@ -53,23 +54,6 @@ var html_busqueda = (prefijo, nrc, cap, disp) => {
       </tbody>
     </table>`;
 };
-/*OBJETOS*/
-/* function Materia(nombre, prefijo, nrc)
-{
-  this.nombre = nombre;
-  this.prefijo = prefijo;
-  this.nrc = nrc;
-}
-function Horario(materias)
-{
-  this.cantidadMaterias = materias.length;
-  this.materias = materias;
-} */
-/* function Horarios(horarios)
-{
-  this.cantidadHorarios = horarios.length;
-  this.horarios = horarios;
-} */
 
 /*
 Función que cambia la animación de las tarjetas SOLAMENTE
@@ -190,12 +174,12 @@ document.addEventListener("click", (e) => {
   {
     var dir = browser.extension.getURL("../data/cupos.json");
     var msj = "";
-    $.getJSON(dir, (json) => {
+    /* $.getJSON(dir, (json) => {
       $.each( json, function( key, val ) {
         msj += "(num: " + (key+1) + " val: " + Object.values(val)[0] + "), ";
-      });
-      alert(msj);
-    });
+      }); 
+      
+    });*/
     //FALTA LECTURA DEL JSON LOCAL
   }
   else if(e.target.classList.contains("search-action"))
@@ -235,7 +219,7 @@ document.addEventListener("click", (e) => {
         search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo incorrecto</p>";
         buscado.appendChild(search);
       }
-      else
+      else if(rta.includes('["'))
       {
         var bus = rta.split(",")[0].split('"')[1];
         var cant = rta.split(",")[1].split('"')[1];
@@ -244,52 +228,23 @@ document.addEventListener("click", (e) => {
         let search = document.createElement("div");
         search.className = "card margin-top animated fadeInRight";
         search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+        buscado.appendChild(search);
+      }
+      else
+      {
+        let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p>";
         buscado.appendChild(search);
       }
     })
     .catch(err => {
-
       let search = document.createElement("div");
-        search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición :"+err.message+"</p>";
-        buscado.appendChild(search);
+      search.className = "card margin-top animated fadeInRight";
+      search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p>";
+      buscado.appendChild(search);
     });
 
-    /*$.get(dir, (rta) => {
-      let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
-      changeAnimationCards([espera]);
-      setTimeout(()=>{
-        buscado.removeChild(espera);
-      }, 700);
-  
-      if(rta == '"prefijo incorrecto"')
-      {
-        let search = document.createElement("div");
-        search.className = "card margin-top animated fadeInRight";
-        search.innerText = "<strong>Error :( -></strong> prefijo incorrecto";
-        buscado.appendChild(search);
-      }
-      else
-      {
-        var bus = rta.split(",")[0].split('"')[1];
-        var cant = rta.split(",")[1].split('"')[1];
-        var disp = rta.split(",")[2].split('"')[1];
-  
-        let search = document.createElement("div");
-        search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
-        buscado.appendChild(search);
-      }
-    });*/
-
-    /* var xhr = new XMLHttpRequest();
-    xhr.open('GET', dir, true);
-    xhr.send();
-    xhr.onreadystatechange = processRequest;
-
-    function processRequest(e) {
-       
-    }  */
   }
   else if(e.target.classList.contains("back"))
   {
@@ -346,7 +301,6 @@ document.addEventListener("click", (e) => {
     changeAnimationButtons(butRef, true);
     
     let horarios = document.querySelectorAll(".cuerpo");
-    var arrHorarios = [];
     for(let h of horarios)
     {
       let materias = h.children;
@@ -374,6 +328,30 @@ document.addEventListener("click", (e) => {
 
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
+
+    for(let ho of arrHorarios)
+    {
+      let numHorario = 1;
+      let tabla = document.createElement("div");
+      tabla.className = "card default margin-top animated fadeInRight";
+      for(let ma of ho.materias)
+      {
+        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+ma.prefijo+"&nrc="+ma.codigo;
+        fetch(dir)
+        .then(response => response.text())
+        .then( rta =>{
+          
+        })
+        .catch( err =>{
+
+        });
+      }
+
+
+
+      numHorario++;
+
+    }
     
   }
   else if(e.target.classList.contains("add-h"))
