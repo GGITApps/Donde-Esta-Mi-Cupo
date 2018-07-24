@@ -11,7 +11,7 @@ var html_horario = (num) =>{
         <th>Código</th>
         <th>NRC</th>
       </thead>
-      <tbody id="tb`+num+`">
+      <tbody id="tb`+num+`" class="cuerpo">
         <tr>
           <td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td>
           <td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td>
@@ -23,10 +23,38 @@ var html_horario = (num) =>{
       <button type="button" name="Añadir materia" class="add-m" value="tb`+num+`"><i class="fas fa-plus"></i>Añadir Materia</button>
       <button type="button" name="Quitar última" class="remove-m" value="tb`+num+`"><i class="fas fa-eraser"></i>Quitar Materia</button>
     </div>
-  </div>`};
+  </div>`;};
+var html_busqueda = (prefijo, nrc, cap, disp) => {
+  let color = "";
+  let porc = (parseInt(disp))/(parseInt(cap));
+  if(porc == NaN)
+    color = "rojo";
+  else if(porc < 0.2)
+    color = "rojo";
+  else if(porc >= 0.2 && porc < 0.5)
+    color = "amarillo";
+  else if(porc >= 0.5)
+    color = "verde";
 
+  return `<table class="tabla-busqueda">
+      <thead>
+        <th>Carrera</th>
+        <th>NRC</th>
+        <th>Capacidad</th>
+        <th>Disponible</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>`+prefijo+`</td>
+          <td>`+nrc+`</td>
+          <td>`+cap+`</td>
+          <td><div class="general `+color+`">`+disp+`</div></td>
+        </tr>
+      </tbody>
+    </table>`;
+};
 /*OBJETOS*/
-function Materia(nombre, prefijo, nrc)
+/* function Materia(nombre, prefijo, nrc)
 {
   this.nombre = nombre;
   this.prefijo = prefijo;
@@ -36,7 +64,7 @@ function Horario(materias)
 {
   this.cantidadMaterias = materias.length;
   this.materias = materias;
-}
+} */
 /* function Horarios(horarios)
 {
   this.cantidadHorarios = horarios.length;
@@ -174,9 +202,65 @@ document.addEventListener("click", (e) => {
   {
     let prefijo = document.getElementById("pr").value;
     let busqueda = document.getElementById("busqueda").value;
+    let buscado = document.querySelector(".content");
+    let carta = document.querySelector(".card.margin-top");
+    if(carta != null)
+    {
+      changeAnimationCards([carta]);
+      setTimeout(()=>{
+        carta.parentNode.removeChild(carta);
+      }, 700);
+    }
 
-    //PETICION GET A CAMILO
+    let temp = document.createElement("div");
+    temp.className = "card margin-top bu animated fadeInRight";
+    temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
+    buscado.appendChild(temp);
 
+    let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+prefijo+"&nrc="+busqueda;
+    /*var ans;
+    fetch(dir)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(json) {
+       ans = json;
+    }); */
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', dir, true);
+    xhr.send();
+    xhr.onreadystatechange = processRequest;
+
+    function processRequest(e) {
+      if (xhr.status == 200 || xhr.status == 304) {
+    
+        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+        changeAnimationCards([espera]);
+        setTimeout(()=>{
+          buscado.removeChild(espera);
+        }, 700);
+    
+        if(xhr.responseText=='"prefijo incorrecto"')
+        {
+          let search = document.createElement("div");
+          search.className = "card margin-top animated fadeInRight";
+          search.innerText = "<strong>Error :( -></strong> prefijo incorrecto";
+          buscado.appendChild(search);
+        }
+        else
+        {
+          var bus = (xhr.responseText).split(",")[0].split('"')[1];
+          var cant = (xhr.responseText).split(",")[1].split('"')[1];
+          var disp = (xhr.responseText).split(",")[2].split('"')[1];
+    
+          let search = document.createElement("div");
+          search.className = "card margin-top animated fadeInRight";
+          search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+          buscado.appendChild(search);
+        }
+      } 
+    } 
   }
   else if(e.target.classList.contains("back"))
   {
@@ -231,28 +315,36 @@ document.addEventListener("click", (e) => {
     changeAnimationButtons(add_h, false);
     changeAnimationButtons(remove_h, false);
     changeAnimationButtons(butRef, true);
-    //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
-    // O LO QUE SEA QUE SE HAGA AQUI.
-    //FALTA LOGICA
+    
     let horarios = document.querySelectorAll(".cuerpo");
     var arrHorarios = [];
-    for(let h in horarios)
+    for(let h of horarios)
     {
       let materias = h.children;
       let arrMaterias = [];
-      for(let m in materias)
+      for(let m of materias)
       {
+
         let campos = m.children;
-        let nom = campos[0].input.text;
-        let pre = campos[1].input.text;
-        let cod = campos[2].input.text;
-        var oMateria = new Materia(nom, pre, cod);
+
+        let nom = campos[0].firstChild.value;
+        let pre = campos[1].firstChild.value.split("-")[0];
+        let cod = campos[2].firstChild.value;
+        var oMateria = {
+          nombre: nom,
+          prefijo: pre,
+          codigo: cod
+        };
         arrMaterias.push(oMateria);
       }
-      var oHorario = new Horario(arrMaterias);
+      var oHorario = {
+        materias: arrMaterias
+      };
       arrHorarios.push(oHorario);
     }
-    console.log(arrHorarios);
+
+    //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
+    // O LO QUE SEA QUE SE HAGA AQUI.
     
   }
   else if(e.target.classList.contains("add-h"))
