@@ -332,6 +332,7 @@ document.addEventListener("click", (e) => {
     for(let ho of arrHorarios)
     {
       let numHorario = 1;
+      let tabla = document.createElement();
       for(let ma of ho.materias)
       {
         let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+ma.prefijo+"&nrc="+ma.codigo;
