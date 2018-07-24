@@ -359,7 +359,7 @@ document.addEventListener("click", (e) => {
 
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
-    let content = document.querySelector(".content");
+    var content = document.querySelector(".content");
     
     let espera = document.querySelectorAll(".card");
     changeAnimationCards(espera);
@@ -371,10 +371,10 @@ document.addEventListener("click", (e) => {
       }
       console.log("REMOVE CARTAS");
       
-    }, 800);
+    }, 700);
 
     
-    let temp = document.createElement("div");
+    var temp = document.createElement("div");
 
     setTimeout(() => {
 
@@ -387,16 +387,16 @@ document.addEventListener("click", (e) => {
     
 
     var tablas = [];
-    for(let ho of arrHorarios)
+    let numHorario = 1;
+    for(let ho in arrHorarios)
     {
-      let numHorario = 1;
       var tabla = document.createElement("div");
       tabla.className = "card default margin-top animated fadeInRight";
       tabla.innerHTML = html_cupos(numHorario);
-      for(let ma of ho.materias)
+      for(let ma in ho.materias)
       {
         let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+(ma.codigo);
-        /* setTimeout(()=>{
+        setTimeout(()=>{
           fetch(dir)
           .then(response => response.text())
           .then( rta =>{
@@ -418,10 +418,11 @@ document.addEventListener("click", (e) => {
   
               let search = document.createElement("tr");
               search.className = "card margin-top animated fadeInRight";
-              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp) ;
-              ma['capacidad'] = cant;
-              ma['disponible'] = disp;
+              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+              
               buscado.appendChild(search);
+              ma.capacidad = cant;
+              ma.disponible = disp;
             }
             else
             {
@@ -437,12 +438,13 @@ document.addEventListener("click", (e) => {
             row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
             buscado.appendChild(row);
           });
-        }, 1000); */
-        var xhr = new XMLHttpRequest();
+        }, 2000);
+        /*var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = processRequest; 
+        xhr.addEventListener('load', processRequest, false);
         xhr.open('GET', dir, true);
         xhr.send();
-        xhr.onreadystatechange = processRequest;
-      
+        
         function processRequest(e) {
           setTimeout(()=>{
             var rta = xhr.responseText; 
@@ -458,14 +460,15 @@ document.addEventListener("click", (e) => {
               var bus = rta.split(",")[0].split('"')[1];
               var cant = rta.split(",")[1].split('"')[1];
               var disp = rta.split(",")[2].split('"')[1];
-        
+              
               let buscado = tabla.getElementById("#tb"+ numHorario);
-
+              
               let search = document.createElement("tr");
               search.className = "card margin-top animated fadeInRight";
-              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp) ;
-              ma['capacidad'] = cant;
-              ma['disponible'] = disp;
+              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+              
+              ma.capacidad = cant;
+              ma.disponible = disp;
               buscado.appendChild(search);
             }
             else
@@ -475,28 +478,37 @@ document.addEventListener("click", (e) => {
               row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
               buscado.appendChild(row);
             }
-          }, 1000);
-        }
+          }, 2000);
+        }*/
       }
       tablas.push(tabla);
       numHorario++;
     }
 
-    let finespera = document.querySelectorAll("card.bu.animated.fadeInRight");
     changeAnimationCards([temp]);
+
     setTimeout(()=>{
-      location.href = "../redirect/cupos.html";
-      console.log("LOCATION CHANGES");
-    }, 1200);
+      
+      let content1 = document.querySelector(".content");
+      content1.removeChild(content.children[0]);
+      let nueva = document.createElement("div");
+      nueva.className = "card animated fadeInRight";
+      nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
+        <p class="welcome">Puedes refrescar la página para tener los cupos actualizados.</p>
+        <p class="welcome"><strong>Recuerda...</strong><br>Refresca los cupos cada cierto tiempo que igual cada vez que lo presiones no se te actualizará inmediatamente.</p>`;
+      content1.insertBefore(nueva, content1.firstChild);;
+      
+      console.log("NEW CARD ADDED");
+    }, 1000);
 
     setTimeout(()=>{
       let contentFin = document.querySelector(".content");
       for(let i = 0; i < tablas.length; i++)
       {
-        console.log(tablas[i]);
+        console.log(tablas[i].innerHTML);
         contentFin.appendChild(tablas[i]);
       }
-    }, 700);
+    }, 5000);
   }
   else if(e.target.classList.contains("add-h"))
   {
