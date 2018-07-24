@@ -201,7 +201,7 @@ document.addEventListener("click", (e) => {
     temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
     buscado.appendChild(temp);
 
-    let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+prefijo+"&nrc="+busqueda;
+    let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(prefijo.toUpperCase())+"&nrc="+busqueda;
     
     fetch(dir)
     .then( response => response.text())
@@ -216,7 +216,7 @@ document.addEventListener("click", (e) => {
       {
         let search = document.createElement("div");
         search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo incorrecto</p>";
+        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto</p>";
         buscado.appendChild(search);
       }
       else if(rta.includes('["'))
@@ -336,7 +336,7 @@ document.addEventListener("click", (e) => {
       tabla.className = "card default margin-top animated fadeInRight";
       for(let ma of ho.materias)
       {
-        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+ma.prefijo+"&nrc="+ma.codigo;
+        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+ma.codigo;
         fetch(dir)
         .then(response => response.text())
         .then( rta =>{
