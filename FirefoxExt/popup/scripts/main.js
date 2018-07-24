@@ -200,10 +200,10 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("search-action"))
   {
-    let prefijo = document.getElementById("pr").value;
-    let busqueda = document.getElementById("busqueda").value;
-    let buscado = document.querySelector(".content");
-    let carta = document.querySelector(".card.margin-top");
+    var prefijo = document.getElementById("pr").value;
+    var busqueda = document.getElementById("busqueda").value;
+    var buscado = document.querySelector(".content");
+    var carta = document.querySelector(".card.margin-top");
     if(carta != null)
     {
       changeAnimationCards([carta]);
@@ -217,50 +217,85 @@ document.addEventListener("click", (e) => {
     temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
     buscado.appendChild(temp);
 
+    let dir2 = "https://donde-estan-mis-cupos-proxy-ua.herokuapp.com/https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+prefijo+"&nrc="+busqueda;
     let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+prefijo+"&nrc="+busqueda;
-    /*var ans;
-    fetch(dir)
-    .then(function(response) {
-      return response.json();
+    
+    fetch(dir2)
+    .then( response => response.text())
+    .then( (rta) => {
+      let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+      changeAnimationCards([espera]);
+      setTimeout(()=>{
+        buscado.removeChild(espera);
+      }, 700);
+  
+      if(rta == '"prefijo incorrecto"')
+      {
+        let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerText = "<strong>Error :( -></strong> prefijo incorrecto";
+        buscado.appendChild(search);
+      }
+      else
+      {
+        var bus = rta.split(",")[0].split('"')[1];
+        var cant = rta.split(",")[1].split('"')[1];
+        var disp = rta.split(",")[2].split('"')[1];
+  
+        let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+        buscado.appendChild(search);
+      }
     })
-    .then(function(json) {
-       ans = json;
-    }); */
+    .catch(err => {
+      let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+      changeAnimationCards([espera]);
+      setTimeout(()=>{
+        buscado.removeChild(espera);
+      }, 700);
 
-    var xhr = new XMLHttpRequest();
+      let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerText = "<strong>Error :( -></strong> DESCONOCIDO O DE SERVIDOR";
+        buscado.appendChild(search);
+    });
+
+    /*$.get(dir, (rta) => {
+      let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+      changeAnimationCards([espera]);
+      setTimeout(()=>{
+        buscado.removeChild(espera);
+      }, 700);
+  
+      if(rta == '"prefijo incorrecto"')
+      {
+        let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerText = "<strong>Error :( -></strong> prefijo incorrecto";
+        buscado.appendChild(search);
+      }
+      else
+      {
+        var bus = rta.split(",")[0].split('"')[1];
+        var cant = rta.split(",")[1].split('"')[1];
+        var disp = rta.split(",")[2].split('"')[1];
+  
+        let search = document.createElement("div");
+        search.className = "card margin-top animated fadeInRight";
+        search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+        buscado.appendChild(search);
+      }
+    });*/
+
+    /* var xhr = new XMLHttpRequest();
     xhr.open('GET', dir, true);
     xhr.send();
     xhr.onreadystatechange = processRequest;
 
     function processRequest(e) {
-      if (xhr.status == 200 || xhr.status == 304) {
-    
-        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
-        changeAnimationCards([espera]);
-        setTimeout(()=>{
-          buscado.removeChild(espera);
-        }, 700);
-    
-        if(xhr.responseText=='"prefijo incorrecto"')
-        {
-          let search = document.createElement("div");
-          search.className = "card margin-top animated fadeInRight";
-          search.innerText = "<strong>Error :( -></strong> prefijo incorrecto";
-          buscado.appendChild(search);
-        }
-        else
-        {
-          var bus = (xhr.responseText).split(",")[0].split('"')[1];
-          var cant = (xhr.responseText).split(",")[1].split('"')[1];
-          var disp = (xhr.responseText).split(",")[2].split('"')[1];
-    
-          let search = document.createElement("div");
-          search.className = "card margin-top animated fadeInRight";
-          search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
-          buscado.appendChild(search);
-        }
-      } 
-    } 
+       
+    }  */
   }
   else if(e.target.classList.contains("back"))
   {
