@@ -55,6 +55,37 @@ var html_busqueda = (prefijo, nrc, cap, disp) => {
     </table>`;
 };
 
+var html_cupos = (num) =>{
+  return `<h4>Horario `+num+`</h4>
+  <table class="tabla-busqueda">
+    <thead>
+      <th>Nombre</th>
+      <th>Carrera</th>
+      <th>NRC</th>
+      <th>Capacidad</th>
+      <th>Disponible</th>
+    </thead>
+    <tbody id="tb`+num+`" class="cuerpo">
+    </tbody>`;
+};
+var html_fila = (name, pre, nrc, cap, disp)=>{
+  let color = "";
+  let porc = (parseInt(disp))/(parseInt(cap));
+  if(porc == NaN || (cap == 0 && disp == 0))
+    color = "rojo";
+  else if(porc < 0.2)
+    color = "rojo";
+  else if(porc >= 0.2 && porc < 0.5)
+    color = "amarillo";
+  else if(porc >= 0.5)
+    color = "verde";
+  return `<td>`+name+`</td>
+    <td>`+pre+`</td>
+    <td>`+nrc+`</td>
+    <td>`+cap+`</td>
+    <td><div class="general `+color+`">`+disp+`</div></td>`;
+};
+
 /*
 Función que cambia la animación de las tarjetas SOLAMENTE
 */
@@ -290,7 +321,6 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("accept"))
   {
-    let butRef = document.querySelectorAll(".refresh");
     let active = document.querySelectorAll(".accept");
     let add_h = document.querySelectorAll(".add-h");
     let remove_h = document.querySelectorAll(".remove-h");
@@ -298,7 +328,6 @@ document.addEventListener("click", (e) => {
     changeAnimationButtons(active, false);
     changeAnimationButtons(add_h, false);
     changeAnimationButtons(remove_h, false);
-    changeAnimationButtons(butRef, true);
     
     let horarios = document.querySelectorAll(".cuerpo");
     for(let h of horarios)
@@ -316,7 +345,9 @@ document.addEventListener("click", (e) => {
         var oMateria = {
           nombre: nom,
           prefijo: pre,
-          codigo: cod
+          codigo: cod,
+          capacidad: "",
+          disponible: ""
         };
         arrMaterias.push(oMateria);
       }
@@ -328,31 +359,105 @@ document.addEventListener("click", (e) => {
 
     //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
     // O LO QUE SEA QUE SE HAGA AQUI.
+    let content = document.querySelector(".content");
+    
+    let espera = document.querySelectorAll(".card");
+    changeAnimationCards(espera);
 
+    setTimeout(() => {
+      for(let i = 0; i<espera.length; i++)
+      {
+        content.removeChild(espera[i]);
+      }
+      console.log("REMOVE CARTAS");
+      
+    }, 800);
+
+    
+    let temp = document.createElement("div");
+
+    setTimeout(() => {
+
+      temp.className = "card bu animated fadeInRight";
+      temp.innerText = "Espera, Estamos procesando tus horarios...";
+      content.appendChild(temp);
+
+      console.log("ANIM CHANGES AND WAIT");
+    }, 700);
+    
+
+    var tablas = [];
     for(let ho of arrHorarios)
     {
       let numHorario = 1;
-      let tabla = document.createElement("div");
+      var tabla = document.createElement("div");
       tabla.className = "card default margin-top animated fadeInRight";
+      tabla.innerHTML = html_cupos(numHorario);
       for(let ma of ho.materias)
       {
         let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+ma.codigo;
-        fetch(dir)
-        .then(response => response.text())
-        .then( rta =>{
-          
-        })
-        .catch( err =>{
-
-        });
+        setTimeout(()=>{
+          fetch(dir)
+          .then(response => response.text())
+          .then( rta =>{
+        
+            if(rta == 'prefijo incorrecto')
+            {
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+              buscado.appendChild(row);
+            }
+            else if(rta.includes('["'))
+            {
+              var bus = rta.split(",")[0].split('"')[1];
+              var cant = rta.split(",")[1].split('"')[1];
+              var disp = rta.split(",")[2].split('"')[1];
+        
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+  
+              let search = document.createElement("tr");
+              search.className = "card margin-top animated fadeInRight";
+              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp) ;
+              ma['capacidad'] = cant;
+              ma['disponible'] = disp;
+              buscado.appendChild(search);
+            }
+            else
+            {
+              let buscado = tabla.getElementById("#tb"+ numHorario);
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+              buscado.appendChild(row);
+            }
+          })
+          .catch( err =>{
+            let buscado = tabla.getElementById("#tb"+ numHorario);
+            let row = document.createElement("tr");
+            row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+            buscado.appendChild(row);
+          });
+        }, 1000);
       }
-
-
-
+      tablas.push(tabla);
       numHorario++;
-
     }
-    
+
+    let finespera = document.querySelectorAll("card.bu.animated.fadeInRight");
+    changeAnimationCards([temp]);
+    setTimeout(()=>{
+      location.href = "../redirect/cupos.html";
+      console.log("LOCATION CHANGES");
+    }, 1200);
+
+    setTimeout(()=>{
+      let contentFin = document.querySelector(".content");
+      for(let i = 0; i < tablas.length; i++)
+      {
+        console.log(tablas[i]);
+        contentFin.appendChild(tablas[i]);
+      }
+    }, 700);
   }
   else if(e.target.classList.contains("add-h"))
   {
