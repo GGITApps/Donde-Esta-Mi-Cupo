@@ -4,8 +4,7 @@ var arrHorarios = [];
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
 var html_horario = (num) =>{
-  return `<div class="card margin-top animated fadeInRight"> 
-    <h4>Horario `+num+`</h4>
+  return `<h4>Horario `+num+`</h4>
     <table class="opc-horario">
       <thead>
         <th>Materia</th>
@@ -23,8 +22,7 @@ var html_horario = (num) =>{
     <div class="align-but">
       <button type="button" name="Añadir materia" class="add-m" value="tb`+num+`"><i class="fas fa-plus"></i>Añadir Materia</button>
       <button type="button" name="Quitar última" class="remove-m" value="tb`+num+`"><i class="fas fa-eraser"></i>Quitar Materia</button>
-    </div>
-  </div>`;};
+    </div>`;};
 var html_busqueda = (prefijo, nrc, cap, disp) => {
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
@@ -65,8 +63,8 @@ var html_cupos = (num) =>{
       <th>Capacidad</th>
       <th>Disponible</th>
     </thead>
-    <tbody id="tb`+num+`" class="cuerpo">
-    </tbody>`;
+    <tbody id="tbc`+num+`" class="cuerpo"></tbody>
+  </table>`;
 };
 var html_fila = (name, pre, nrc, cap, disp)=>{
   let color = "";
@@ -162,6 +160,7 @@ function accionHorario(add)
   {
     opcHorario++;
     let new_card = document.createElement("div");
+    new_card.className = "card margin-top animated fadeInRight";
     new_card.innerHTML = html_horario(opcHorario.toString());
     buscado.appendChild(new_card);
   }
@@ -179,6 +178,22 @@ function accionHorario(add)
   }
 }
 
+/**
+ * Función para hacer un delay sincrono y no petaquear a camilo :v
+ */
+function sleep(milliseconds) 
+{
+  var start = new Date().getTime();
+  for (let i = 0; i < 1e7; i++) 
+  {
+    if ((new Date().getTime() - start) > milliseconds)
+    {
+      break;
+    }
+  }
+}
+
+//COSAS DE LA WEB DE LA EJECUCIÓN EN GENERAL
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("start")) 
   {
@@ -306,24 +321,13 @@ document.addEventListener("click", (e) => {
         console.log("LOCATION BACK");
       }, 700);
     }
-    else if(loc.includes("cupos"))
-    {
-      let cards = document.querySelectorAll(".card");
-      let butts = document.querySelectorAll("button.animated");
-      changeAnimationCards(cards);
-      changeAnimationButtons(butts, false);
-
-      setTimeout(()=>{
-        location.href = "../popup.html";
-        console.log("LOCATION BACK");
-      }, 700);
-    }
   }
   else if(e.target.classList.contains("accept"))
   {
     let active = document.querySelectorAll(".accept");
     let add_h = document.querySelectorAll(".add-h");
     let remove_h = document.querySelectorAll(".remove-h");
+    let ref = document.querySelectorAll(".refresh");
 
     changeAnimationButtons(active, false);
     changeAnimationButtons(add_h, false);
@@ -340,7 +344,7 @@ document.addEventListener("click", (e) => {
         let campos = m.children;
 
         let nom = campos[0].firstChild.value;
-        let pre = campos[1].firstChild.value.split("-")[0];
+        let pre = campos[1].firstChild.value;
         let cod = campos[2].firstChild.value;
         var oMateria = {
           nombre: nom,
@@ -361,145 +365,87 @@ document.addEventListener("click", (e) => {
     // O LO QUE SEA QUE SE HAGA AQUI.
     var content = document.querySelector(".content");
     
-    let espera = document.querySelectorAll(".card");
+    var espera = document.querySelectorAll(".card");
     changeAnimationCards(espera);
 
     setTimeout(() => {
+      let content1 = document.querySelector(".content");
+      
       for(let i = 0; i<espera.length; i++)
-      {
-        content.removeChild(espera[i]);
+      { 
+        content1.removeChild(espera[i]);
       }
       console.log("REMOVE CARTAS");
-      
-    }, 700);
 
-    
-    var temp = document.createElement("div");
-
-    setTimeout(() => {
-
-      temp.className = "card bu animated fadeInRight";
-      temp.innerText = "Espera, Estamos procesando tus horarios...";
-      content.appendChild(temp);
-
-      console.log("ANIM CHANGES AND WAIT");
-    }, 700);
-    
-
-    var tablas = [];
-    let numHorario = 1;
-    for(let ho in arrHorarios)
-    {
-      var tabla = document.createElement("div");
-      tabla.className = "card default margin-top animated fadeInRight";
-      tabla.innerHTML = html_cupos(numHorario);
-      for(let ma in ho.materias)
-      {
-        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+(ma.codigo);
-        setTimeout(()=>{
-          fetch(dir)
-          .then(response => response.text())
-          .then( rta =>{
-        
-            if(rta == 'prefijo incorrecto')
-            {
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-              let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
-              buscado.appendChild(row);
-            }
-            else if(rta.includes('["'))
-            {
-              var bus = rta.split(",")[0].split('"')[1];
-              var cant = rta.split(",")[1].split('"')[1];
-              var disp = rta.split(",")[2].split('"')[1];
-        
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-  
-              let search = document.createElement("tr");
-              search.className = "card margin-top animated fadeInRight";
-              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
-              
-              buscado.appendChild(search);
-              ma.capacidad = cant;
-              ma.disponible = disp;
-            }
-            else
-            {
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-              let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
-              buscado.appendChild(row);
-            }
-          })
-          .catch( err =>{
-            let buscado = tabla.getElementById("#tb"+ numHorario);
-            let row = document.createElement("tr");
-            row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
-            buscado.appendChild(row);
-          });
-        }, 2000);
-        /*var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = processRequest; 
-        xhr.addEventListener('load', processRequest, false);
-        xhr.open('GET', dir, true);
-        xhr.send();
-        
-        function processRequest(e) {
-          setTimeout(()=>{
-            var rta = xhr.responseText; 
-            if(rta == 'prefijo incorrecto')
-            {
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-              let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
-              buscado.appendChild(row);
-            }
-            else if(rta.includes('["'))
-            {
-              var bus = rta.split(",")[0].split('"')[1];
-              var cant = rta.split(",")[1].split('"')[1];
-              var disp = rta.split(",")[2].split('"')[1];
-              
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-              
-              let search = document.createElement("tr");
-              search.className = "card margin-top animated fadeInRight";
-              search.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
-              
-              ma.capacidad = cant;
-              ma.disponible = disp;
-              buscado.appendChild(search);
-            }
-            else
-            {
-              let buscado = tabla.getElementById("#tb"+ numHorario);
-              let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
-              buscado.appendChild(row);
-            }
-          }, 2000);
-        }*/
-      }
-      tablas.push(tabla);
-      numHorario++;
-    }
-
-    changeAnimationCards([temp]);
+    }, 600);
 
     setTimeout(()=>{
-      
       let content1 = document.querySelector(".content");
-      content1.removeChild(content.children[0]);
       let nueva = document.createElement("div");
       nueva.className = "card animated fadeInRight";
       nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
-        <p class="welcome">Puedes refrescar la página para tener los cupos actualizados.</p>
+        <p class="welcome">ESPERA A QUE CARGUEN COMPLETAMENTE<br>Puedes refrescar la página para tener los cupos actualizados.</p>
         <p class="welcome"><strong>Recuerda...</strong><br>Refresca los cupos cada cierto tiempo que igual cada vez que lo presiones no se te actualizará inmediatamente.</p>`;
-      content1.insertBefore(nueva, content1.firstChild);;
-      
+      content1.insertBefore(nueva, content1.firstChild);
+      /* content.appendChild(nueva); */
       console.log("NEW CARD ADDED");
-    }, 1000);
+    
+    var tablas = [];
+    let numHorario = 1;
+    for(let ho of arrHorarios)
+    {
+      let tabla = null;
+      tabla = document.createElement("div");
+      tabla.className = "card default margin-top animated fadeInRight";
+      tabla.innerHTML = html_cupos(numHorario);
+      for(let ma of ho.materias)
+      {
+        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
+        console.log(dir);
+        
+        let buscado = null;
+        buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+
+        fetch(dir)
+        .then(response => response.text())
+        .then( rta =>{
+          if(rta == 'prefijo incorrecto')
+          {
+            let row = document.createElement("tr");
+            row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+            buscado.appendChild(row);
+          }
+          else if(rta.includes('["'))
+          {
+            let bus = rta.split(",")[0].split('"')[1];
+            let cant = rta.split(",")[1].split('"')[1];
+            let disp = rta.split(",")[2].split('"')[1];
+            
+            let row = document.createElement("tr");
+            row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+            
+            ma.capacidad = cant;
+            ma.disponible = disp;
+            buscado.appendChild(row);
+          }
+          else
+          {
+            let row = document.createElement("tr");
+            row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+            buscado.appendChild(row);
+          }
+        })
+        .catch( err =>{
+          let row = document.createElement("tr");
+          row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+          buscado.appendChild(row);
+        });
+        sleep(800);
+      } 
+      /*content.appendChild(tabla);*/
+      tablas.push(tabla);
+      numHorario++;
+    }
 
     setTimeout(()=>{
       let contentFin = document.querySelector(".content");
@@ -508,7 +454,9 @@ document.addEventListener("click", (e) => {
         console.log(tablas[i].innerHTML);
         contentFin.appendChild(tablas[i]);
       }
-    }, 5000);
+    }, 800);
+    changeAnimationButtons(ref, true);
+    }, 1000);
   }
   else if(e.target.classList.contains("add-h"))
   {
