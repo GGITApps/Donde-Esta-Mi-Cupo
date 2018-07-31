@@ -505,24 +505,27 @@ document.addEventListener("click", (e) => {
 });
 
 //COSAS PARA QUE EL ENTER SIRVA EN LA BUSQUEDA.
-var input = document.getElementById("pr");
-var input2 = document.getElementById("busqueda");
-// Execute a function when the user releases a key on the keyboard
-input.addEventListener("keyup", function(event) {
-  // Cancel the default action, if needed
-  event.preventDefault();
-  // Number 13 is the "Enter" key on the keyboard
-  if (event.keyCode === 13) {
-    // Trigger the button element with a click
-    document.getElementById("bus-act").click();
-  }
-}); 
-input2.addEventListener("keyup", function(event) {
-  // Cancel the default action, if needed
-  event.preventDefault();
-  // Number 13 is the "Enter" key on the keyboard
-  if (event.keyCode === 13) {
-    // Trigger the button element with a click
-    document.getElementById("bus-act").click();
-  }
-}); 
+if(location.href.contains("search.html"))
+{
+  var input = document.getElementById("pr");
+  var input2 = document.getElementById("busqueda");
+  // Execute a function when the user releases a key on the keyboard
+  input.addEventListener("keyup", function(event) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      // Trigger the button element with a click
+      document.getElementById("bus-act").click();
+    }
+  }); 
+  input2.addEventListener("keyup", function(event) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      // Trigger the button element with a click
+      document.getElementById("bus-act").click();
+    }
+  }); 
+}
