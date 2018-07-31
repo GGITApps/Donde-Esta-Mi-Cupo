@@ -505,7 +505,7 @@ document.addEventListener("click", (e) => {
 });
 
 //COSAS PARA QUE EL ENTER SIRVA EN LA BUSQUEDA.
-if(location.href.contains("search.html"))
+if(location.href.includes("search.html"))
 {
   var input = document.getElementById("pr");
   var input2 = document.getElementById("busqueda");
