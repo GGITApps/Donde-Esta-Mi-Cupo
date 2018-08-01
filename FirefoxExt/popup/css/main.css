@@ -544,7 +544,7 @@ button:disabled:hover{
   cursor: default;
 }
 button:disabled:active{
-  background-color: white;
+  background-color: #2DA839;
 }
 .warning{
   /*border: 1px solid #FF4F5E !important;*/

@@ -1,7 +1,7 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
 var arrHorarios = [];
-var tablas = [];
+var tablasTexto = [];
 var fechaHorario;
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
@@ -212,11 +212,11 @@ function allFilled()
 function guardarHorarios()
 {
   browser.storage.sync.set({
-    horarios: arrHorarios,
-    tablas: tablas
+    horarios: arrHorarios
   })
   .then((item)=>{
     console.log("GUARDADO CON EXITO");
+
   },(error)=>{
     console.log("Error obteniendo horario: " + error.message);
   });
@@ -229,12 +229,36 @@ function guardarHorarios()
 function obtenerHorarios()
 {
   let retorno = [];
-  let busqueda = browser.storage.sync.get(["horarios","tablas"]);
+  let busqueda = browser.storage.sync.get("horarios");
   busqueda.then((item)=>{
     retorno.push(item.horarios);
-    retorno.push(item.tablas);
     console.log("OBTENIDO CON EXITO");
     console.log(item);
+      
+    let content = document.querySelector(".content");
+
+    let numHorario = 1;
+    for(let ho of item.horarios)
+    {
+      let tabla = null;
+      tabla = document.createElement("div");
+      tabla.className = "card default margin-top animated fadeInRight";
+      tabla.innerHTML = html_cupos(numHorario);
+      console.log("DENTRO HOR");
+      for(let ma of ho.materias)
+      {
+        let buscado = null;
+        buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+        console.log("DENTRO MAT");
+        let row = document.createElement("tr");
+        row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+
+        buscado.appendChild(row);         
+      } 
+      content.appendChild(tabla);
+      numHorario++;
+    }
+
   },(error)=>{
     console.log("Error obteniendo horario: " + error.message);
   });
@@ -281,31 +305,53 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("last"))
   {
-    let horarios = obtenerHorarios();
-    if(horarios != [])
-    {
-      arrHorarios = horarios[0];
-      tablasLast = horarios[1];
-      location.href = "redirect/last.html";
-
-      let content = document.querySelector(".content");
-      for(let i = 0; i < tablasLast.length; i++)
+    location.href = "redirect/last.html";
+    setTimeout(() => {
+      let horarios = obtenerHorarios();
+      if(horarios != [])
       {
-        content.appendChild(tablasLast[i]);
+        /* console.log("OJALA");
+        
+        let content = document.querySelector(".content");
+        
+        let numHorario = 1;
+        for(let ho of horarios)
+        {
+          let tabla = null;
+          tabla = document.createElement("div");
+          tabla.className = "card default margin-top animated fadeInRight";
+          tabla.innerHTML = html_cupos(numHorario);
+          console.log("DENTRO HOR");
+          for(let ma of ho.materias)
+          {
+            let buscado = null;
+            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+            console.log("DENTRO MAT");
+            let row = document.createElement("tr");
+            row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+  
+            buscado.appendChild(row);         
+          } 
+          content.appendChild(tabla);
+          numHorario++;
+        } */
+  
+        fechaHorario = new Date();
+        arrHorarios = horarios;
       }
-    }
-    else
-    {
-      let last = document.querySelector(".last");
-      last.classList.add("wobble");
-      last.classList.add("animated");
-      last.classList.add("warning");
-      setTimeout(()=>{
-        last.classList.remove("wobble");
-        last.classList.remove("animated");
-        last.classList.remove("warning");
-      }, 1000);
-    }
+      else
+      {
+        let last = document.querySelector(".last");
+        last.classList.add("wobble");
+        last.classList.add("animated");
+        last.classList.add("warning");
+        setTimeout(()=>{
+          last.classList.remove("wobble");
+          last.classList.remove("animated");
+          last.classList.remove("warning");
+        }, 1000);
+      }
+    }, 800);
   }
   else if(e.target.classList.contains("search-action"))
   {
@@ -427,7 +473,8 @@ document.addEventListener("click", (e) => {
       changeAnimationButtons(active, false);
       changeAnimationButtons(add_h, false);
       changeAnimationButtons(remove_h, false);
-      
+
+      arrHorarios = [];
       let horarios = document.querySelectorAll(".cuerpo");
       for(let h of horarios)
       {
@@ -485,6 +532,7 @@ document.addEventListener("click", (e) => {
         console.log("NEW CARD ADDED");
       
         let numHorario = 1;
+        var tablas = [];
         for(let ho of arrHorarios)
         {
           let tabla = null;
@@ -558,8 +606,8 @@ document.addEventListener("click", (e) => {
           setTimeout(()=>{
             ref[0].classList.remove("zoomIn");
             ref[0].classList.remove("animated");
-            save[0].classList.remove("zoomIn");
-            save[0].classList.remove("animated");
+            save.classList.remove("zoomIn");
+            save.classList.remove("animated");
           }, 800);
         }, 4000);
 
@@ -596,7 +644,7 @@ document.addEventListener("click", (e) => {
         /* content.appendChild(nueva); */
         console.log("NEW CARD ADDED");
       
-        tablas = [];
+        var tablas = [];
         let numHorario = 1;
         for(let ho of arrHorarios)
         {
