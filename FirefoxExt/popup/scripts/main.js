@@ -1,6 +1,7 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
 var arrHorarios = [];
+var tablas = [];
 var fechaHorario;
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
@@ -206,6 +207,41 @@ function allFilled()
 }
 
 /**
+ * Función para guardar el arreglo con los horarios el la storage sync.
+ */
+function guardarHorarios()
+{
+  browser.storage.sync.set({
+    horarios: arrHorarios,
+    tablas: tablas
+  })
+  .then((item)=>{
+    console.log("GUARDADO CON EXITO");
+  },(error)=>{
+    console.log("Error obteniendo horario: " + error.message);
+  });
+}
+
+/**
+ * Función para obtener los horarios previamente guardados.
+ * retorna el objeto arreglo con los horarios.
+ */
+function obtenerHorarios()
+{
+  let retorno = [];
+  let busqueda = browser.storage.sync.get(["horarios","tablas"]);
+  busqueda.then((item)=>{
+    retorno.push(item.horarios);
+    retorno.push(item.tablas);
+    console.log("OBTENIDO CON EXITO");
+    console.log(item);
+  },(error)=>{
+    console.log("Error obteniendo horario: " + error.message);
+  });
+  return retorno;
+}
+
+/**
  * Función para hacer un delay sincrono y no petaquear a camilo :v
  */
 function sleep(milliseconds) 
@@ -245,10 +281,31 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("last"))
   {
-    var dir = browser.extension.getURL("../data/cupos.json");
-    var msj = "";
-    //TODO FALTAAAAAAAAAAAAA
-    //FALTA LECTURA DEL JSON LOCAL
+    let horarios = obtenerHorarios();
+    if(horarios != [])
+    {
+      arrHorarios = horarios[0];
+      tablasLast = horarios[1];
+      location.href = "redirect/last.html";
+
+      let content = document.querySelector(".content");
+      for(let i = 0; i < tablasLast.length; i++)
+      {
+        content.appendChild(tablasLast[i]);
+      }
+    }
+    else
+    {
+      let last = document.querySelector(".last");
+      last.classList.add("wobble");
+      last.classList.add("animated");
+      last.classList.add("warning");
+      setTimeout(()=>{
+        last.classList.remove("wobble");
+        last.classList.remove("animated");
+        last.classList.remove("warning");
+      }, 1000);
+    }
   }
   else if(e.target.classList.contains("search-action"))
   {
@@ -345,6 +402,18 @@ document.addEventListener("click", (e) => {
         console.log("LOCATION BACK");
       }, 700);
     }
+    else if(loc.includes("last"))
+    {
+      let cards = document.querySelectorAll(".card");
+      let butts = document.querySelectorAll("button.animated");
+      changeAnimationCards(cards);
+      changeAnimationButtons(butts, false);
+
+      setTimeout(()=>{
+        location.href = "../popup.html";
+        console.log("LOCATION BACK");
+      }, 700);
+    }
   }
   else if(e.target.classList.contains("accept"))
   {
@@ -415,7 +484,6 @@ document.addEventListener("click", (e) => {
         /* content.appendChild(nueva); */
         console.log("NEW CARD ADDED");
       
-        var tablas = [];
         let numHorario = 1;
         for(let ho of arrHorarios)
         {
@@ -528,7 +596,7 @@ document.addEventListener("click", (e) => {
         /* content.appendChild(nueva); */
         console.log("NEW CARD ADDED");
       
-        var tablas = [];
+        tablas = [];
         let numHorario = 1;
         for(let ho of arrHorarios)
         {
@@ -609,6 +677,10 @@ document.addEventListener("click", (e) => {
         butRef.classList.remove("warning");
       }, 1000);
     }
+  }
+  else if(e.target.classList.contains("save"))
+  {
+    guardarHorarios();
   }
   else if(e.target.classList.contains("add-h"))
   {
