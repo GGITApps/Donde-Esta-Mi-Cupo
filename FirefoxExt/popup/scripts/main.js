@@ -1,7 +1,6 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
 var arrHorarios = [];
-var tablasTexto = [];
 var fechaHorario;
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
@@ -224,45 +223,77 @@ function guardarHorarios()
 
 /**
  * Función para obtener los horarios previamente guardados.
- * retorna el objeto arreglo con los horarios.
+ * Luego de esto realiza las acciones pertinentes para poner el horario en last.html.
  */
 function obtenerHorarios()
 {
-  let retorno = [];
   let busqueda = browser.storage.sync.get("horarios");
   busqueda.then((item)=>{
-    retorno.push(item.horarios);
+
     console.log("OBTENIDO CON EXITO");
     console.log(item);
-      
-    let content = document.querySelector(".content");
-
-    let numHorario = 1;
-    for(let ho of item.horarios)
+    
+    if(Object.keys(item).length != 0)
     {
-      let tabla = null;
-      tabla = document.createElement("div");
-      tabla.className = "card default margin-top animated fadeInRight";
-      tabla.innerHTML = html_cupos(numHorario);
-      console.log("DENTRO HOR");
-      for(let ma of ho.materias)
+      console.log("OJALA");
+      
+      let tablas = [];
+      let numHorario = 1;
+      for(let ho of item.horarios)
       {
-        let buscado = null;
-        buscado = tabla.children[1].querySelector("#tbc"+numHorario);
-        console.log("DENTRO MAT");
-        let row = document.createElement("tr");
-        row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+        let tabla = null;
+        tabla = document.createElement("div");
+        tabla.className = "card default margin-top animated fadeInRight";
+        tabla.innerHTML = html_cupos(numHorario);
+        console.log("DENTRO HOR");
+        for(let ma of ho.materias)
+        {
+          let buscado = null;
+          buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+          console.log("DENTRO MAT");
+          let row = document.createElement("tr");
+          row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+          console.log(1);
+          
+          buscado.appendChild(row);         
+          console.log(2);
+        } 
+        /* content.appendChild(tabla); */
+        tablas.push(tabla);
+        numHorario++;
+      }
+      
+      fechaHorario = new Date();
+      arrHorarios = item.horarios;
+      console.log("Antes de redirigir");
+      
+      location.href = "redirect/last.html";
+      console.log("LOGRO REDIRIGIR");
 
-        buscado.appendChild(row);         
-      } 
-      content.appendChild(tabla);
-      numHorario++;
+      setTimeout(() => {
+        let content = document.querySelector(".content");
+        for(let i = 0; i < tablas.length; i++)
+        {
+          content.appendChild(tablas[i]);
+        }
+      }, 700);
+    }
+    else
+    {
+      let last = document.querySelector(".last");
+      last.classList.add("wobble");
+      last.classList.add("animated");
+      last.classList.add("warning");
+      setTimeout(()=>{
+        last.classList.remove("wobble");
+        last.classList.remove("animated");
+        last.classList.remove("warning");
+      }, 1000);
     }
 
   },(error)=>{
     console.log("Error obteniendo horario: " + error.message);
   });
-  return retorno;
 }
 
 /**
@@ -304,54 +335,10 @@ document.addEventListener("click", (e) => {
 
   }
   else if(e.target.classList.contains("last"))
-  {
-    location.href = "redirect/last.html";
-    setTimeout(() => {
-      let horarios = obtenerHorarios();
-      if(horarios != [])
-      {
-        /* console.log("OJALA");
-        
-        let content = document.querySelector(".content");
-        
-        let numHorario = 1;
-        for(let ho of horarios)
-        {
-          let tabla = null;
-          tabla = document.createElement("div");
-          tabla.className = "card default margin-top animated fadeInRight";
-          tabla.innerHTML = html_cupos(numHorario);
-          console.log("DENTRO HOR");
-          for(let ma of ho.materias)
-          {
-            let buscado = null;
-            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
-            console.log("DENTRO MAT");
-            let row = document.createElement("tr");
-            row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
-  
-            buscado.appendChild(row);         
-          } 
-          content.appendChild(tabla);
-          numHorario++;
-        } */
-  
-        fechaHorario = new Date();
-        arrHorarios = horarios;
-      }
-      else
-      {
-        let last = document.querySelector(".last");
-        last.classList.add("wobble");
-        last.classList.add("animated");
-        last.classList.add("warning");
-        setTimeout(()=>{
-          last.classList.remove("wobble");
-          last.classList.remove("animated");
-          last.classList.remove("warning");
-        }, 1000);
-      }
-    }, 800);
+  {    
+    console.log("ANTES");
+    obtenerHorarios();
+    console.log("DESPUES");    
   }
   else if(e.target.classList.contains("search-action"))
   {
@@ -532,7 +519,7 @@ document.addEventListener("click", (e) => {
         console.log("NEW CARD ADDED");
       
         let numHorario = 1;
-        var tablas = [];
+        let tablas = [];
         for(let ho of arrHorarios)
         {
           let tabla = null;
