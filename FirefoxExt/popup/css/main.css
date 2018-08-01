@@ -148,7 +148,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .search-action:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 
 
@@ -175,7 +175,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .start:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 .start .fa-edit{
   padding-right: 5px
@@ -203,7 +203,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .search:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 .search .fa-search{
   padding-right: 5px
@@ -231,7 +231,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .last:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 .last .fa-undo-alt{
   padding-right: 5px
@@ -261,7 +261,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .refresh:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 
 /*BOTON ACCEPT*/
@@ -287,7 +287,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .accept:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 
 /*BOTON BACK*/
@@ -313,7 +313,33 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .back:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
+}
+
+/*BOTON SAVE*/
+.save{
+  position: fixed;
+  bottom: 60px;
+  left: 15px;
+  border: none;
+  height: 33px;
+  width: 33px;
+  color: white;
+  background-color: #2DA839;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.save:hover{
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.save:active{
+  background-color:rgb(43, 108, 194);
 }
 
 /*______HORARIOS______*/
@@ -338,7 +364,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .add-h:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 
 /*BOTON REMOVE HORARIO*/
@@ -362,11 +388,12 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .remove-h:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 
-/*______MATERIAS_____*/
 
+
+/*______MATERIAS_____*/
 .align-but{
   margin-top: 15px;
   display: flex;
@@ -395,7 +422,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .add-m:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 .add-m .fa-plus{
   padding-right: 5px
@@ -423,7 +450,7 @@ header h1{
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .remove-m:active{
-  color:rgb(43, 108, 194);
+  background-color:rgb(43, 108, 194);
 }
 .remove-m .fa-eraser{
   padding-right: 5px
@@ -517,10 +544,11 @@ button:disabled:hover{
   cursor: default;
 }
 button:disabled:active{
-  color: white;
+  background-color: white;
 }
 .warning{
-  border: 1px solid #FF4F5E !important;
+  /*border: 1px solid #FF4F5E !important;*/
+  background-color: rgb(255, 79, 94, 0.72) !important;
 }
 
 footer{

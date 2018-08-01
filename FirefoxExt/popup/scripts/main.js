@@ -1,6 +1,7 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
 var arrHorarios = [];
+var fechaHorario;
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
 var html_horario = (num) =>{
@@ -99,9 +100,9 @@ function changeAnimationCards(cards)
   console.log("ANIMATION CHANGES");
 }
 
-/*
-Función que cambia la animación de los botones SOLAMENTE
-si es true aparece, si es false desaparece.
+/**
+  *Función que cambia la animación de los botones SOLAMENTE
+  *si es true aparece, si es false desaparece.
 */
 function changeAnimationButtons(buttons, appears)
 {
@@ -388,7 +389,6 @@ document.addEventListener("click", (e) => {
 
       //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
       // O LO QUE SEA QUE SE HAGA AQUI.
-      var content = document.querySelector(".content");
       
       var espera = document.querySelectorAll(".card");
       changeAnimationCards(espera);
@@ -409,8 +409,8 @@ document.addEventListener("click", (e) => {
         let nueva = document.createElement("div");
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
-          <p class="welcome">ESPERA A QUE CARGUEN COMPLETAMENTE<br>Puedes refrescar la página para tener los cupos actualizados.</p>
-          <p class="welcome"><strong>Recuerda...</strong><br>Refresca los cupos cada cierto tiempo que igual cada vez que lo presiones no se te actualizará inmediatamente.</p>`;
+        <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+        <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
         content1.insertBefore(nueva, content1.firstChild);
         /* content.appendChild(nueva); */
         console.log("NEW CARD ADDED");
@@ -480,7 +480,133 @@ document.addEventListener("click", (e) => {
             contentFin.appendChild(tablas[i]);
           }
         }, 800);
-        changeAnimationButtons(ref, true);
+
+        fechaHorario = new Date();
+
+        setTimeout(()=>{
+          let save = document.querySelector(".save");
+          changeAnimationButtons(ref, true);
+          changeAnimationButtons([save], true);
+          setTimeout(()=>{
+            ref[0].classList.remove("zoomIn");
+            ref[0].classList.remove("animated");
+            save[0].classList.remove("zoomIn");
+            save[0].classList.remove("animated");
+          }, 800);
+        }, 4000);
+
+      }, 1000);
+    }
+  }
+  else if(e.target.classList.contains("refresh"))
+  {
+    let fechaActual = new Date();
+    if((fechaActual.getTime() - fechaHorario.getTime()) >= (60000))
+    {
+      var espera = document.querySelectorAll(".card");
+      changeAnimationCards(espera);
+
+      setTimeout(() => {
+        let content1 = document.querySelector(".content");
+        
+        for(let i = 0; i<espera.length; i++)
+        { 
+          content1.removeChild(espera[i]);
+        }
+        console.log("REMOVE CARTAS");
+
+      }, 600);
+
+      setTimeout(()=>{
+        let content1 = document.querySelector(".content");
+        let nueva = document.createElement("div");
+        nueva.className = "card animated fadeInRight";
+        nueva.innerHTML = `<h3>¡ Recién Actualizados !</h3>
+          <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+          <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
+        content1.insertBefore(nueva, content1.firstChild);
+        /* content.appendChild(nueva); */
+        console.log("NEW CARD ADDED");
+      
+        var tablas = [];
+        let numHorario = 1;
+        for(let ho of arrHorarios)
+        {
+          let tabla = null;
+          tabla = document.createElement("div");
+          tabla.className = "card default margin-top animated fadeInRight";
+          tabla.innerHTML = html_cupos(numHorario);
+          for(let ma of ho.materias)
+          {
+            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
+            console.log(dir);
+            
+            let buscado = null;
+            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+
+            fetch(dir)
+            .then(response => response.text())
+            .then( rta =>{
+              if(rta == 'prefijo incorrecto')
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+                buscado.appendChild(row);
+              }
+              else if(rta.includes('["'))
+              {
+                let bus = rta.split(",")[0].split('"')[1];
+                let cant = rta.split(",")[1].split('"')[1];
+                let disp = rta.split(",")[2].split('"')[1];
+                
+                let row = document.createElement("tr");
+                row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+                
+                ma.capacidad = cant;
+                ma.disponible = disp;
+                buscado.appendChild(row);
+              }
+              else
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+                buscado.appendChild(row);
+              }
+            })
+            .catch( err =>{
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+              buscado.appendChild(row);
+            });
+            sleep(800);
+          } 
+          /*content.appendChild(tabla);*/
+          tablas.push(tabla);
+          numHorario++;
+        }
+
+        setTimeout(()=>{
+          let contentFin = document.querySelector(".content");
+          for(let i = 0; i < tablas.length; i++)
+          {
+            console.log(tablas[i].innerHTML);
+            contentFin.appendChild(tablas[i]);
+          }
+        }, 800);
+        
+        fechaHorario = new Date();
+      }, 1000);
+    }
+    else
+    {
+      let butRef = document.querySelector(".refresh");
+      butRef.classList.add("wobble");
+      butRef.classList.add("animated");
+      butRef.classList.add("warning");
+      setTimeout(()=>{
+        butRef.classList.remove("wobble");
+        butRef.classList.remove("animated");
+        butRef.classList.remove("warning");
       }, 1000);
     }
   }
