@@ -1,11 +1,11 @@
 /*VARIABLES*/ 
 var opcHorario = 1;
 var arrHorarios = [];
+var fechaHorario;
 const MAX_OPC = 5;
 const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
 var html_horario = (num) =>{
-  return `<div class="card margin-top animated fadeInRight"> 
-    <h4>Horario `+num+`</h4>
+  return `<h4>Horario `+num+`</h4>
     <table class="opc-horario">
       <thead>
         <th>Materia</th>
@@ -23,8 +23,7 @@ var html_horario = (num) =>{
     <div class="align-but">
       <button type="button" name="Añadir materia" class="add-m" value="tb`+num+`"><i class="fas fa-plus"></i>Añadir Materia</button>
       <button type="button" name="Quitar última" class="remove-m" value="tb`+num+`"><i class="fas fa-eraser"></i>Quitar Materia</button>
-    </div>
-  </div>`;};
+    </div>`;};
 var html_busqueda = (prefijo, nrc, cap, disp) => {
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
@@ -55,6 +54,37 @@ var html_busqueda = (prefijo, nrc, cap, disp) => {
     </table>`;
 };
 
+var html_cupos = (num) =>{
+  return `<h4>Horario `+num+`</h4>
+  <table class="tabla-busqueda">
+    <thead>
+      <th>Nombre</th>
+      <th>Carrera</th>
+      <th>NRC</th>
+      <th>Capacidad</th>
+      <th>Disponible</th>
+    </thead>
+    <tbody id="tbc`+num+`" class="cuerpo"></tbody>
+  </table>`;
+};
+var html_fila = (name, pre, nrc, cap, disp)=>{
+  let color = "";
+  let porc = (parseInt(disp))/(parseInt(cap));
+  if(isNaN(porc) || (cap == 0 && disp == 0))
+    color = "rojo";
+  else if(porc < 0.2)
+    color = "rojo";
+  else if(porc >= 0.2 && porc < 0.5)
+    color = "amarillo";
+  else if(porc >= 0.5)
+    color = "verde";
+  return `<td>`+name+`</td>
+    <td>`+pre+`</td>
+    <td>`+nrc+`</td>
+    <td>`+cap+`</td>
+    <td><div class="general `+color+`">`+disp+`</div></td>`;
+};
+
 /*
 Función que cambia la animación de las tarjetas SOLAMENTE
 */
@@ -70,9 +100,9 @@ function changeAnimationCards(cards)
   console.log("ANIMATION CHANGES");
 }
 
-/*
-Función que cambia la animación de los botones SOLAMENTE
-si es true aparece, si es false desaparece.
+/**
+  *Función que cambia la animación de los botones SOLAMENTE
+  *si es true aparece, si es false desaparece.
 */
 function changeAnimationButtons(buttons, appears)
 {
@@ -98,6 +128,40 @@ function changeAnimationButtons(buttons, appears)
 
   });
   console.log("BUTTON ANIMATION CHANGES");
+}
+
+/**
+ * Funcion para añadir los distintos tipos de alertas según el valor 
+ * recibido por parámetro.
+ * param -> error, success
+ * param -> texto dentro de la alerta.
+ */
+function alertar(tipo, texto)
+{
+  let cont = document.querySelector(".alert-container");
+  let alerta = document.createElement("div");
+  if(tipo === "success")
+  {
+    alerta.className = "alert alert-success animated bounceIn";
+    alerta.innerHTML = "<p>"+texto+"</p>";
+    cont.appendChild(alerta);
+  }
+  else
+  {
+    alerta.className = "alert alert-error animated bounceIn";
+    alerta.innerHTML = "<p>"+texto+"</p>";
+    cont.appendChild(alerta);
+  }
+  setTimeout(() => {
+    alerta.classList.remove("bounceIn");
+    alerta.classList.remove("animated");
+
+    alerta.classList.add("zoomOut");
+    alerta.classList.add("animated");
+    setTimeout(() => {
+      cont.removeChild(alerta);
+    }, 800);
+  }, 4300);
 }
 
 /*
@@ -131,6 +195,7 @@ function accionHorario(add)
   {
     opcHorario++;
     let new_card = document.createElement("div");
+    new_card.className = "card margin-top animated fadeInRight";
     new_card.innerHTML = html_horario(opcHorario.toString());
     buscado.appendChild(new_card);
   }
@@ -148,6 +213,130 @@ function accionHorario(add)
   }
 }
 
+/**
+ * Función para verificar que todos los campos estén llenos.
+ * True si todo está lleno, false de lo contrario.
+ */
+function allFilled()
+{
+  let campos = document.querySelectorAll("input");
+  let isIt = true;
+  for(let i = 0; i < campos.length; i++)
+  {
+    if(campos[i].value.trim() == "")
+    {
+      isIt = false;
+      campos[i].classList.add("tada");
+      campos[i].classList.add("animated");
+      campos[i].classList.add("warning");
+      setTimeout(()=>{
+        campos[i].classList.remove("tada");
+        campos[i].classList.remove("animated");
+        campos[i].classList.remove("warning");
+      }, 1000);
+    }
+  }
+  if(!(isIt))
+  {
+    alertar("error", "No has llenado todos los campos :(");
+  }
+  return isIt;
+}
+
+/**
+ * Función para guardar el arreglo con los horarios el la storage sync.
+ */
+function guardarHorarios()
+{
+  browser.storage.sync.set({
+    horarios: arrHorarios
+  })
+  .then((item)=>{
+    console.log("GUARDADO CON EXITO");
+    alertar("success", "Tus horarios y los cupos se guardaron exitosamente :)");
+
+  },(error)=>{
+    console.log("Error obteniendo horario: " + error.message);
+    alertar("error", "Ocurrió un error al obtener el último horario :(<br>"+error.message);
+  });
+}
+
+/**
+ * Función para obtener los horarios previamente guardados.
+ * Luego de esto realiza las acciones pertinentes para poner el horario en last.html.
+ */
+(function obtenerHorarios()
+{
+  if(location.href.includes("last.html"))
+  {
+    let ref = document.querySelector(".refresh");
+    ref.classList.remove("zoomIn");
+    ref.classList.remove("animated");
+
+    let busqueda = browser.storage.sync.get("horarios");
+    busqueda.then((item)=>{
+  
+      console.log("OBTENIDO CON EXITO");
+      
+      let tablas = [];
+      let numHorario = 1;
+      for(let ho of item.horarios)
+      {
+        let tabla = null;
+        tabla = document.createElement("div");
+        tabla.className = "card default margin-top animated fadeInRight";
+        tabla.innerHTML = html_cupos(numHorario);
+        console.log("DENTRO HOR");
+        for(let ma of ho.materias)
+        {
+          let buscado = null;
+          buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+          console.log("DENTRO MAT");
+          let row = document.createElement("tr");
+          row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+          console.log(1);
+          
+          buscado.appendChild(row);         
+          console.log(2);
+        } 
+        /* content.appendChild(tabla); */
+        tablas.push(tabla);
+        numHorario++;
+      }
+      
+      fechaHorario = new Date((new Date().getTime()-60000));
+      arrHorarios = item.horarios;
+
+      setTimeout(() => {
+        let content = document.querySelector(".content");
+        for(let i = 0; i < tablas.length; i++)
+        {
+          content.appendChild(tablas[i]);
+        }
+      }, 700);
+
+    },(error)=>{
+      //YA SE MANEJA EN EL LISTENER DE LAST
+    });
+  }
+})();
+
+/**
+ * Función para hacer un delay sincrono y no petaquear a camilo :v
+ */
+function sleep(milliseconds) 
+{
+  var start = new Date().getTime();
+  for (let i = 0; i < 1e7; i++) 
+  {
+    if ((new Date().getTime() - start) > milliseconds)
+    {
+      break;
+    }
+  }
+}
+
+//COSAS DE LA WEB DE LA EJECUCIÓN EN GENERAL
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("start")) 
   {
@@ -171,80 +360,99 @@ document.addEventListener("click", (e) => {
 
   }
   else if(e.target.classList.contains("last"))
-  {
-    var dir = browser.extension.getURL("../data/cupos.json");
-    var msj = "";
-    /* $.getJSON(dir, (json) => {
-      $.each( json, function( key, val ) {
-        msj += "(num: " + (key+1) + " val: " + Object.values(val)[0] + "), ";
-      });
-      
-    }); */
-    //FALTA LECTURA DEL JSON LOCAL
-  }
-  else if(e.target.classList.contains("search-action"))
-  {
-    var prefijo = document.getElementById("pr").value;
-    var busqueda = document.getElementById("busqueda").value;
-    var buscado = document.querySelector(".content");
-    var carta = document.querySelector(".card.margin-top");
-    if(carta != null)
-    {
-      changeAnimationCards([carta]);
-      setTimeout(()=>{
-        carta.parentNode.removeChild(carta);
-      }, 700);
-    }
-
-    let temp = document.createElement("div");
-    temp.className = "card margin-top bu animated fadeInRight";
-    temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
-    buscado.appendChild(temp);
-
-    let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(prefijo.toUpperCase())+"&nrc="+busqueda;
-    
-    fetch(dir)
-    .then( response => response.text())
-    .then( (rta) => {
-      let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
-      changeAnimationCards([espera]);
-      setTimeout(()=>{
-        buscado.removeChild(espera);
-      }, 700);
-  
-      if(rta == 'prefijo incorrecto')
+  {    
+    console.log("ANTES");
+    browser.storage.sync.get("horarios")
+    .then((item)=>{
+      if(Object.keys(item).length != 0)
       {
-        let search = document.createElement("div");
-        search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto</p>";
-        buscado.appendChild(search);
-      }
-      else if(rta.includes('["'))
-      {
-        var bus = rta.split(",")[0].split('"')[1];
-        var cant = rta.split(",")[1].split('"')[1];
-        var disp = rta.split(",")[2].split('"')[1];
-  
-        let search = document.createElement("div");
-        search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
-        buscado.appendChild(search);
+        location.href = "redirect/last.html";
       }
       else
       {
+        alertar("error", "Aún no tienes horarios anteriores guardados :(");
+
+        let last = document.querySelector(".last");
+        last.classList.add("wobble");
+        last.classList.add("animated");
+        last.classList.add("warning");
+        setTimeout(()=>{
+          last.classList.remove("wobble");
+          last.classList.remove("animated");
+          last.classList.remove("warning");
+        }, 1000);
+      }
+    },(error)=>{
+      console.log("Error obteniendo horario: " + error.message);
+      alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no haya guardado uno previamente.");
+    });
+    /* obtenerHorarios(); */   
+  }
+  else if(e.target.classList.contains("search-action"))
+  {
+    if(allFilled())
+    {
+      var prefijo = document.getElementById("pr").value.trim();
+      var busqueda = document.getElementById("busqueda").value.trim();
+      var buscado = document.querySelector(".content");
+      var carta = document.querySelector(".card.margin-top");
+      if(carta != null)
+      {
+        changeAnimationCards([carta]);
+        setTimeout(()=>{
+          carta.parentNode.removeChild(carta);
+        }, 700);
+      }
+
+      let temp = document.createElement("div");
+      temp.className = "card margin-top bu animated fadeInRight";
+      temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
+      buscado.appendChild(temp);
+
+      let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(prefijo.toUpperCase())+"&nrc="+busqueda;
+      
+      fetch(dir)
+      .then( response => response.text())
+      .then( (rta) => {
+        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+        changeAnimationCards([espera]);
+        setTimeout(()=>{
+          buscado.removeChild(espera);
+        }, 700);
+    
+        if(rta == 'prefijo incorrecto')
+        {
+          let search = document.createElement("div");
+          search.className = "card margin-top animated fadeInRight";
+          search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto</p>";
+          buscado.appendChild(search);
+        }
+        else if(rta.includes('["'))
+        {
+          var bus = rta.split(",")[0].split('"')[1];
+          var cant = rta.split(",")[1].split('"')[1];
+          var disp = rta.split(",")[2].split('"')[1];
+    
+          let search = document.createElement("div");
+          search.className = "card margin-top animated fadeInRight";
+          search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+          buscado.appendChild(search);
+        }
+        else
+        {
+          let search = document.createElement("div");
+          search.className = "card margin-top animated fadeInRight";
+          search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p>";
+          buscado.appendChild(search);
+        }
+      })
+      .catch(err => {
         let search = document.createElement("div");
         search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p>";
+        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p>";
         buscado.appendChild(search);
-      }
-    })
-    .catch(err => {
-      let search = document.createElement("div");
-      search.className = "card margin-top animated fadeInRight";
-      search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p>";
-      buscado.appendChild(search);
-    });
-
+      });
+    }
   }
   else if(e.target.classList.contains("back"))
   {
@@ -275,7 +483,7 @@ document.addEventListener("click", (e) => {
         console.log("LOCATION BACK");
       }, 700);
     }
-    else if(loc.includes("cupos"))
+    else if(loc.includes("last"))
     {
       let cards = document.querySelectorAll(".card");
       let butts = document.querySelectorAll("button.animated");
@@ -290,69 +498,281 @@ document.addEventListener("click", (e) => {
   }
   else if(e.target.classList.contains("accept"))
   {
-    let butRef = document.querySelectorAll(".refresh");
-    let active = document.querySelectorAll(".accept");
-    let add_h = document.querySelectorAll(".add-h");
-    let remove_h = document.querySelectorAll(".remove-h");
-
-    changeAnimationButtons(active, false);
-    changeAnimationButtons(add_h, false);
-    changeAnimationButtons(remove_h, false);
-    changeAnimationButtons(butRef, true);
-    
-    let horarios = document.querySelectorAll(".cuerpo");
-    for(let h of horarios)
+    if(allFilled())
     {
-      let materias = h.children;
-      let arrMaterias = [];
-      for(let m of materias)
+      let active = document.querySelectorAll(".accept");
+      let add_h = document.querySelectorAll(".add-h");
+      let remove_h = document.querySelectorAll(".remove-h");
+      let ref = document.querySelectorAll(".refresh");
+
+      changeAnimationButtons(active, false);
+      changeAnimationButtons(add_h, false);
+      changeAnimationButtons(remove_h, false);
+
+      arrHorarios = [];
+      let horarios = document.querySelectorAll(".cuerpo");
+      for(let h of horarios)
       {
+        let materias = h.children;
+        let arrMaterias = [];
+        for(let m of materias)
+        {
 
-        let campos = m.children;
+          let campos = m.children;
 
-        let nom = campos[0].firstChild.value;
-        let pre = campos[1].firstChild.value.split("-")[0];
-        let cod = campos[2].firstChild.value;
-        var oMateria = {
-          nombre: nom,
-          prefijo: pre,
-          codigo: cod
+          let nom = campos[0].firstChild.value;
+          let pre = campos[1].firstChild.value;
+          let cod = campos[2].firstChild.value;
+          var oMateria = {
+            nombre: nom,
+            prefijo: pre,
+            codigo: cod,
+            capacidad: "-",
+            disponible: "-"
+          };
+          arrMaterias.push(oMateria);
+        }
+        var oHorario = {
+          materias: arrMaterias
         };
-        arrMaterias.push(oMateria);
+        arrHorarios.push(oHorario);
       }
-      var oHorario = {
-        materias: arrMaterias
-      };
-      arrHorarios.push(oHorario);
+
+      //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
+      // O LO QUE SEA QUE SE HAGA AQUI.
+      
+      var espera = document.querySelectorAll(".card");
+      changeAnimationCards(espera);
+
+      setTimeout(() => {
+        let content1 = document.querySelector(".content");
+        
+        for(let i = 0; i<espera.length; i++)
+        { 
+          content1.removeChild(espera[i]);
+        }
+        console.log("REMOVE CARTAS");
+
+      }, 600);
+
+      setTimeout(()=>{
+        let content1 = document.querySelector(".content");
+        let nueva = document.createElement("div");
+        nueva.className = "card animated fadeInRight";
+        nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
+        <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+        <p class="welcome">También puedes guardar tus horarios ingresados! y si ocurrió un error con alguna materia no te preocupes, puedes refrescar tu horario guardado para actualizar sus cupos!</p>
+        <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
+        content1.insertBefore(nueva, content1.firstChild);
+        /* content.appendChild(nueva); */
+        console.log("NEW CARD ADDED");
+      
+        let numHorario = 1;
+        let tablas = [];
+        for(let ho of arrHorarios)
+        {
+          let tabla = null;
+          tabla = document.createElement("div");
+          tabla.className = "card default margin-top animated fadeInRight";
+          tabla.innerHTML = html_cupos(numHorario);
+          for(let ma of ho.materias)
+          {
+            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
+            console.log(dir);
+            
+            let buscado = null;
+            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+
+            fetch(dir)
+            .then(response => response.text())
+            .then( rta =>{
+              if(rta == 'prefijo incorrecto')
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+                buscado.appendChild(row);
+              }
+              else if(rta.includes('["'))
+              {
+                let bus = rta.split(",")[0].split('"')[1];
+                let cant = rta.split(",")[1].split('"')[1];
+                let disp = rta.split(",")[2].split('"')[1];
+                
+                let row = document.createElement("tr");
+                row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+                
+                ma.capacidad = cant;
+                ma.disponible = disp;
+                buscado.appendChild(row);
+              }
+              else
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+                buscado.appendChild(row);
+              }
+            })
+            .catch( err =>{
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+              buscado.appendChild(row);
+            });
+            sleep(800);
+          } 
+          /*content.appendChild(tabla);*/
+          tablas.push(tabla);
+          numHorario++;
+        }
+
+        setTimeout(()=>{
+          let contentFin = document.querySelector(".content");
+          for(let i = 0; i < tablas.length; i++)
+          {
+            console.log(tablas[i].innerHTML);
+            contentFin.appendChild(tablas[i]);
+          }
+        }, 800);
+
+        fechaHorario = new Date();
+
+        setTimeout(()=>{
+          let save = document.querySelector(".save");
+          changeAnimationButtons(ref, true);
+          changeAnimationButtons([save], true);
+          setTimeout(()=>{
+            ref[0].classList.remove("zoomIn");
+            ref[0].classList.remove("animated");
+            save.classList.remove("zoomIn");
+            save.classList.remove("animated");
+          }, 800);
+        }, 4000);
+
+      }, 1000);
     }
-
-    //TODO AQUI SE HACE LA PETICION AL SCRAPPER Y ESO
-    // O LO QUE SEA QUE SE HAGA AQUI.
-
-    for(let ho of arrHorarios)
+  }
+  else if(e.target.classList.contains("refresh"))
+  {
+    let fechaActual = new Date();
+    if((fechaActual.getTime() - fechaHorario.getTime()) >= (60000))
     {
-      let numHorario = 1;
-      let tabla = document.createElement("div");
-      tabla.className = "card default margin-top animated fadeInRight";
-      for(let ma of ho.materias)
+      if(location.href.includes("last"))
       {
-        let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(ma.prefijo.toUpperCase())+"&nrc="+ma.codigo;
-        fetch(dir)
-        .then(response => response.text())
-        .then( rta =>{
-          
-        })
-        .catch( err =>{
-
-        });
+        let sav = document.querySelector(".save");
+        changeAnimationButtons([sav], true);
       }
+      var espera = document.querySelectorAll(".card");
+      changeAnimationCards(espera);
 
+      setTimeout(() => {
+        let content1 = document.querySelector(".content");
+        
+        for(let i = 0; i<espera.length; i++)
+        { 
+          content1.removeChild(espera[i]);
+        }
+        console.log("REMOVE CARTAS");
 
+      }, 600);
 
-      numHorario++;
+      setTimeout(()=>{
+        let content1 = document.querySelector(".content");
+        let nueva = document.createElement("div");
+        nueva.className = "card animated fadeInRight";
+        nueva.innerHTML = `<h3>¡ Recién Actualizados !</h3>
+          <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+          <p class="welcome">Si le das a guardar, se almacenaran todos los horarios con los cupos que tenga en ese momento cada materia !</p>
+          <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
+        content1.insertBefore(nueva, content1.firstChild);
+        /* content.appendChild(nueva); */
+        console.log("NEW CARD ADDED");
+      
+        var tablas = [];
+        let numHorario = 1;
+        for(let ho of arrHorarios)
+        {
+          let tabla = null;
+          tabla = document.createElement("div");
+          tabla.className = "card default margin-top animated fadeInRight";
+          tabla.innerHTML = html_cupos(numHorario);
+          for(let ma of ho.materias)
+          {
+            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
+            console.log(dir);
+            
+            let buscado = null;
+            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
 
+            fetch(dir)
+            .then(response => response.text())
+            .then( rta =>{
+              if(rta == 'prefijo incorrecto')
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
+                buscado.appendChild(row);
+              }
+              else if(rta.includes('["'))
+              {
+                let bus = rta.split(",")[0].split('"')[1];
+                let cant = rta.split(",")[1].split('"')[1];
+                let disp = rta.split(",")[2].split('"')[1];
+                
+                let row = document.createElement("tr");
+                row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+                
+                ma.capacidad = cant;
+                ma.disponible = disp;
+                buscado.appendChild(row);
+              }
+              else
+              {
+                let row = document.createElement("tr");
+                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+                buscado.appendChild(row);
+              }
+            })
+            .catch( err =>{
+              let row = document.createElement("tr");
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+              buscado.appendChild(row);
+            });
+            sleep(800);
+          } 
+          /*content.appendChild(tabla);*/
+          tablas.push(tabla);
+          numHorario++;
+        }
+
+        setTimeout(()=>{
+          let contentFin = document.querySelector(".content");
+          for(let i = 0; i < tablas.length; i++)
+          {
+            console.log(tablas[i].innerHTML);
+            contentFin.appendChild(tablas[i]);
+          }
+        }, 800);
+        
+        fechaHorario = new Date();
+      }, 1000);
     }
-    
+    else
+    {
+      let restante = 60 - Math.floor((fechaActual.getTime() - fechaHorario.getTime())/1000);
+      alertar("error", "Aún debes esperar "+restante+" segundos para poder refrescar los cupos");
+      let butRef = document.querySelector(".refresh");
+      butRef.classList.add("wobble");
+      butRef.classList.add("animated");
+      butRef.classList.add("warning");
+      setTimeout(()=>{
+        butRef.classList.remove("wobble");
+        butRef.classList.remove("animated");
+        butRef.classList.remove("warning");
+      }, 1000);
+    }
+  }
+  else if(e.target.classList.contains("save"))
+  {
+    guardarHorarios();
   }
   else if(e.target.classList.contains("add-h"))
   {
@@ -373,3 +793,29 @@ document.addEventListener("click", (e) => {
     accionMateria(cual, false);
   }
 });
+
+//COSAS PARA QUE EL ENTER SIRVA EN LA BUSQUEDA.
+if(location.href.includes("search.html"))
+{
+  var input = document.getElementById("pr");
+  var input2 = document.getElementById("busqueda");
+  // Execute a function when the user releases a key on the keyboard
+  input.addEventListener("keyup", function(event) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      // Trigger the button element with a click
+      document.getElementById("bus-act").click();
+    }
+  }); 
+  input2.addEventListener("keyup", function(event) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      // Trigger the button element with a click
+      document.getElementById("bus-act").click();
+    }
+  }); 
+}
