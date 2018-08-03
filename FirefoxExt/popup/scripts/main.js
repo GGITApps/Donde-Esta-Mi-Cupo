@@ -70,7 +70,7 @@ var html_cupos = (num) =>{
 var html_fila = (name, pre, nrc, cap, disp)=>{
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
-  if(porc == NaN || (cap == 0 && disp == 0))
+  if(isNaN(porc) || (cap == 0 && disp == 0))
     color = "rojo";
   else if(porc < 0.2)
     color = "rojo";
@@ -128,6 +128,40 @@ function changeAnimationButtons(buttons, appears)
 
   });
   console.log("BUTTON ANIMATION CHANGES");
+}
+
+/**
+ * Funcion para añadir los distintos tipos de alertas según el valor 
+ * recibido por parámetro.
+ * param -> error, success
+ * param -> texto dentro de la alerta.
+ */
+function alertar(tipo, texto)
+{
+  let cont = document.querySelector(".alert-container");
+  let alerta = document.createElement("div");
+  if(tipo === "success")
+  {
+    alerta.className = "alert alert-success animated bounceIn";
+    alerta.innerHTML = "<p>"+texto+"</p>";
+    cont.appendChild(alerta);
+  }
+  else
+  {
+    alerta.className = "alert alert-error animated bounceIn";
+    alerta.innerHTML = "<p>"+texto+"</p>";
+    cont.appendChild(alerta);
+  }
+  setTimeout(() => {
+    alerta.classList.remove("bounceIn");
+    alerta.classList.remove("animated");
+
+    alerta.classList.add("zoomOut");
+    alerta.classList.add("animated");
+    setTimeout(() => {
+      cont.removeChild(alerta);
+    }, 800);
+  }, 4300);
 }
 
 /*
@@ -202,6 +236,10 @@ function allFilled()
       }, 1000);
     }
   }
+  if(!(isIt))
+  {
+    alertar("error", "No has llenado todos los campos :(");
+  }
   return isIt;
 }
 
@@ -215,9 +253,11 @@ function guardarHorarios()
   })
   .then((item)=>{
     console.log("GUARDADO CON EXITO");
+    alertar("success", "Tus horarios y los cupos se guardaron exitosamente :)");
 
   },(error)=>{
     console.log("Error obteniendo horario: " + error.message);
+    alertar("error", "Ocurrió un error al obtener el último horario :(<br>"+error.message);
   });
 }
 
@@ -225,17 +265,18 @@ function guardarHorarios()
  * Función para obtener los horarios previamente guardados.
  * Luego de esto realiza las acciones pertinentes para poner el horario en last.html.
  */
-function obtenerHorarios()
+(function obtenerHorarios()
 {
-  let busqueda = browser.storage.sync.get("horarios");
-  busqueda.then((item)=>{
+  if(location.href.includes("last.html"))
+  {
+    let ref = document.querySelector(".refresh");
+    ref.classList.remove("zoomIn");
+    ref.classList.remove("animated");
 
-    console.log("OBTENIDO CON EXITO");
-    console.log(item);
-    
-    if(Object.keys(item).length != 0)
-    {
-      console.log("OJALA");
+    let busqueda = browser.storage.sync.get("horarios");
+    busqueda.then((item)=>{
+  
+      console.log("OBTENIDO CON EXITO");
       
       let tablas = [];
       let numHorario = 1;
@@ -263,12 +304,8 @@ function obtenerHorarios()
         numHorario++;
       }
       
-      fechaHorario = new Date();
+      fechaHorario = new Date((new Date().getTime()-60000));
       arrHorarios = item.horarios;
-      console.log("Antes de redirigir");
-      
-      location.href = "redirect/last.html";
-      console.log("LOGRO REDIRIGIR");
 
       setTimeout(() => {
         let content = document.querySelector(".content");
@@ -277,24 +314,12 @@ function obtenerHorarios()
           content.appendChild(tablas[i]);
         }
       }, 700);
-    }
-    else
-    {
-      let last = document.querySelector(".last");
-      last.classList.add("wobble");
-      last.classList.add("animated");
-      last.classList.add("warning");
-      setTimeout(()=>{
-        last.classList.remove("wobble");
-        last.classList.remove("animated");
-        last.classList.remove("warning");
-      }, 1000);
-    }
 
-  },(error)=>{
-    console.log("Error obteniendo horario: " + error.message);
-  });
-}
+    },(error)=>{
+      //YA SE MANEJA EN EL LISTENER DE LAST
+    });
+  }
+})();
 
 /**
  * Función para hacer un delay sincrono y no petaquear a camilo :v
@@ -337,8 +362,31 @@ document.addEventListener("click", (e) => {
   else if(e.target.classList.contains("last"))
   {    
     console.log("ANTES");
-    obtenerHorarios();
-    console.log("DESPUES");    
+    browser.storage.sync.get("horarios")
+    .then((item)=>{
+      if(Object.keys(item).length != 0)
+      {
+        location.href = "redirect/last.html";
+      }
+      else
+      {
+        alertar("error", "Aún no tienes horarios anteriores guardados :(");
+
+        let last = document.querySelector(".last");
+        last.classList.add("wobble");
+        last.classList.add("animated");
+        last.classList.add("warning");
+        setTimeout(()=>{
+          last.classList.remove("wobble");
+          last.classList.remove("animated");
+          last.classList.remove("warning");
+        }, 1000);
+      }
+    },(error)=>{
+      console.log("Error obteniendo horario: " + error.message);
+      alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no haya guardado uno previamente.");
+    });
+    /* obtenerHorarios(); */   
   }
   else if(e.target.classList.contains("search-action"))
   {
@@ -479,8 +527,8 @@ document.addEventListener("click", (e) => {
             nombre: nom,
             prefijo: pre,
             codigo: cod,
-            capacidad: "",
-            disponible: ""
+            capacidad: "-",
+            disponible: "-"
           };
           arrMaterias.push(oMateria);
         }
@@ -513,6 +561,7 @@ document.addEventListener("click", (e) => {
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
         <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+        <p class="welcome">También puedes guardar tus horarios ingresados! y si ocurrió un error con alguna materia no te preocupes, puedes refrescar tu horario guardado para actualizar sus cupos!</p>
         <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
         content1.insertBefore(nueva, content1.firstChild);
         /* content.appendChild(nueva); */
@@ -606,6 +655,11 @@ document.addEventListener("click", (e) => {
     let fechaActual = new Date();
     if((fechaActual.getTime() - fechaHorario.getTime()) >= (60000))
     {
+      if(location.href.includes("last"))
+      {
+        let sav = document.querySelector(".save");
+        changeAnimationButtons([sav], true);
+      }
       var espera = document.querySelectorAll(".card");
       changeAnimationCards(espera);
 
@@ -626,6 +680,7 @@ document.addEventListener("click", (e) => {
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Recién Actualizados !</h3>
           <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
+          <p class="welcome"><b>Si le das a guardar, se almacenaran todos los horarios con los cupos que tenga en ese momento cada materia !</p>
           <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
         content1.insertBefore(nueva, content1.firstChild);
         /* content.appendChild(nueva); */
@@ -702,6 +757,8 @@ document.addEventListener("click", (e) => {
     }
     else
     {
+      let restante = 60 - Math.floor((fechaActual.getTime() - fechaHorario.getTime())/1000);
+      alertar("error", "Aún debes esperar "+restante+" segundos para poder refrescar los cupos");
       let butRef = document.querySelector(".refresh");
       butRef.classList.add("wobble");
       butRef.classList.add("animated");
