@@ -680,7 +680,7 @@ document.addEventListener("click", (e) => {
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Recién Actualizados !</h3>
           <p class="welcome"><b>ESPERA A QUE CARGUEN COMPLETAMENTE :O</b><br><br>Puedes refrescar la página para tener los cupos actualizados.</p>
-          <p class="welcome"><b>Si le das a guardar, se almacenaran todos los horarios con los cupos que tenga en ese momento cada materia !</p>
+          <p class="welcome">Si le das a guardar, se almacenaran todos los horarios con los cupos que tenga en ese momento cada materia !</p>
           <p class="welcome"><strong>Recuerda...</strong><br>El botón de refrescar los cupos funciona cada minuto para no sobrecargar el servidor.</p>`;
         content1.insertBefore(nueva, content1.firstChild);
         /* content.appendChild(nueva); */
