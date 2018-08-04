@@ -248,16 +248,19 @@ function allFilled()
  */
 function guardarHorarios()
 {
-  browser.storage.sync.set({
+  chrome.storage.sync.set({
     horarios: arrHorarios
-  })
-  .then((item)=>{
-    console.log("GUARDADO CON EXITO");
-    alertar("success", "Tus horarios y los cupos se guardaron exitosamente :)");
-
-  },(error)=>{
-    console.log("Error obteniendo horario: " + error.message);
-    alertar("error", "Ocurrió un error al obtener el último horario :(<br>"+error.message);
+  }, ()=>{
+    if(!chrome.runtime.lastError)
+    {
+      console.log("GUARDADO CON EXITO");
+      alertar("success", "Tus horarios y los cupos se guardaron exitosamente :)");
+    }
+    else
+    {
+      console.log("Error obteniendo horarios");
+      alertar("error", "Ocurrió un error al obtener el último horario :(<br> "+chrome.runtime.lastError.message);
+    }
   });
 }
 
@@ -273,50 +276,48 @@ function guardarHorarios()
     ref.classList.remove("zoomIn");
     ref.classList.remove("animated");
 
-    let busqueda = browser.storage.sync.get("horarios");
-    busqueda.then((item)=>{
-  
-      console.log("OBTENIDO CON EXITO");
-      
-      let tablas = [];
-      let numHorario = 1;
-      for(let ho of item.horarios)
+    chrome.storage.sync.get("horarios", (item)=>{
+      if(!chrome.runtime.lastError)
       {
-        let tabla = null;
-        tabla = document.createElement("div");
-        tabla.className = "card default margin-top animated fadeInRight";
-        tabla.innerHTML = html_cupos(numHorario);
-        console.log("DENTRO HOR");
-        for(let ma of ho.materias)
+        console.log("OBTENIDO CON EXITO");
+        
+        let tablas = [];
+        let numHorario = 1;
+        for(let ho of item.horarios)
         {
-          let buscado = null;
-          buscado = tabla.children[1].querySelector("#tbc"+numHorario);
-          console.log("DENTRO MAT");
-          let row = document.createElement("tr");
-          row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
-          console.log(1);
-          
-          buscado.appendChild(row);         
-          console.log(2);
-        } 
-        /* content.appendChild(tabla); */
-        tablas.push(tabla);
-        numHorario++;
-      }
-      
-      fechaHorario = new Date((new Date().getTime()-60000));
-      arrHorarios = item.horarios;
-
-      setTimeout(() => {
-        let content = document.querySelector(".content");
-        for(let i = 0; i < tablas.length; i++)
-        {
-          content.appendChild(tablas[i]);
+          let tabla = null;
+          tabla = document.createElement("div");
+          tabla.className = "card default margin-top animated fadeInRight";
+          tabla.innerHTML = html_cupos(numHorario);
+          console.log("DENTRO HOR");
+          for(let ma of ho.materias)
+          {
+            let buscado = null;
+            buscado = tabla.children[1].querySelector("#tbc"+numHorario);
+            console.log("DENTRO MAT");
+            let row = document.createElement("tr");
+            row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+            console.log(1);
+            
+            buscado.appendChild(row);         
+            console.log(2);
+          } 
+          /* content.appendChild(tabla); */
+          tablas.push(tabla);
+          numHorario++;
         }
-      }, 700);
-
-    },(error)=>{
-      //YA SE MANEJA EN EL LISTENER DE LAST
+        
+        fechaHorario = new Date((new Date().getTime()-60000));
+        arrHorarios = item.horarios;
+  
+        setTimeout(() => {
+          let content = document.querySelector(".content");
+          for(let i = 0; i < tablas.length; i++)
+          {
+            content.appendChild(tablas[i]);
+          }
+        }, 700);
+      }
     });
   }
 })();
@@ -362,31 +363,34 @@ document.addEventListener("click", (e) => {
   else if(e.target.classList.contains("last"))
   {    
     console.log("ANTES");
-    browser.storage.sync.get("horarios")
-    .then((item)=>{
-      if(Object.keys(item).length != 0)
+    chrome.storage.sync.get("horarios", (item)=>{
+      if(!chrome.runtime.lastError)
       {
-        location.href = "redirect/last.html";
+        if(Object.keys(item).length != 0)
+        {
+          location.href = "redirect/last.html";
+        }
+        else
+        {
+          alertar("error", "Aún no tienes horarios anteriores guardados :(");
+  
+          let last = document.querySelector(".last");
+          last.classList.add("wobble");
+          last.classList.add("animated");
+          last.classList.add("warning");
+          setTimeout(()=>{
+            last.classList.remove("wobble");
+            last.classList.remove("animated");
+            last.classList.remove("warning");
+          }, 1000);
+        }
       }
       else
       {
-        alertar("error", "Aún no tienes horarios anteriores guardados :(");
-
-        let last = document.querySelector(".last");
-        last.classList.add("wobble");
-        last.classList.add("animated");
-        last.classList.add("warning");
-        setTimeout(()=>{
-          last.classList.remove("wobble");
-          last.classList.remove("animated");
-          last.classList.remove("warning");
-        }, 1000);
+        console.log("Error obteniendo horario: "+chrome.runtime.lastError.message);
+        alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no haya guardado uno previamente.");
       }
-    },(error)=>{
-      console.log("Error obteniendo horario: " + error.message);
-      alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no haya guardado uno previamente.");
-    });
-    /* obtenerHorarios(); */   
+    });  
   }
   else if(e.target.classList.contains("search-action"))
   {

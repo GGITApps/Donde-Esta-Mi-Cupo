@@ -1,10 +1,11 @@
 @font-face {
-  font-family: "Raleway";
-  src: url(https://fonts.googleapis.com/css?family=Raleway:300,400,700) format("truetype");
+  font-family: 'Raleway';
+  src: url(https://fonts.googleapis.com/css?family=Raleway:300,400,700);
 }
 
 html{
   font-family: 'Raleway', sans-serif;
+  font-size: 1.33em;
 }
 input{
   font-family: 'Raleway';
@@ -19,7 +20,7 @@ body::-webkit-scrollbar-track
 
 body::-webkit-scrollbar
 {
-	width: 12px;
+	width: 7px;
 	background-color: #F5F5F5;
 }
 
@@ -31,6 +32,7 @@ body::-webkit-scrollbar-thumb
 	background-color: #555;
 }
 body{
+  font-family: 'Raleway', sans-serif;
   width: 600px;
   margin: 0;
   overflow-x: hidden;
@@ -55,6 +57,7 @@ header{
   top: 0px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   z-index: 100;
+  width: 100%;
 }
 header .logo{
   height: 40px;
@@ -112,6 +115,9 @@ header h1{
   display: inline-block;
   text-align: center;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+.card-s #pr::-webkit-calendar-picker-indicator {
+  display: none;
 }
 .card-s input{
   border: 0;
@@ -392,7 +398,6 @@ header h1{
 }
 
 
-
 /*______MATERIAS_____*/
 .align-but{
   margin-top: 15px;
@@ -545,6 +550,10 @@ button:disabled:hover{
 }
 button:disabled:active{
   background-color: #2DA839;
+}
+input:focus,
+button:focus {
+    outline: none;
 }
 .warning{
   /*border: 1px solid #FF4F5E !important;*/
