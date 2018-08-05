@@ -27,7 +27,7 @@ var html_horario = (num) =>{
 var html_busqueda = (prefijo, nrc, cap, disp) => {
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
-  if(porc == NaN || (cap == 0 && disp == 0))
+  if(isNaN(porc) || (cap == 0 && disp == 0))
     color = "rojo";
   else if(porc < 0.2)
     color = "rojo";

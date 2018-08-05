@@ -546,6 +546,9 @@ button:disabled:hover{
 button:disabled:active{
   background-color: #2DA839;
 }
+.fa, .fas{
+  pointer-events: none;
+}
 .warning{
   /*border: 1px solid #FF4F5E !important;*/
   background-color: rgb(255, 79, 94, 0.72) !important;
