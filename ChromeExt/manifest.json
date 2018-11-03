@@ -1,6 +1,6 @@
 {
     "name": "¿Dónde Están Mis Cupos?",
-    "version": "1.0",
+    "version": "2.0",
     "description": "Cupos de tus materias elegidas en banner",
     "icons": {
       "128":"icons/icon128.png",
@@ -12,11 +12,12 @@
         "default_popup": "popup/popup.html" 
     },
     "web_accessible_resources": [
-      "*://fonts.googleapis.com/*",
+      "*://*/*",
       "../data/cursos.json"
     ],
     "permissions": [
-      "activeTab"
+      "activeTab",
+      "storage"
     ],
     "manifest_version": 2
   }
