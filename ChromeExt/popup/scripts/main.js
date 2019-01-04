@@ -3,19 +3,17 @@ var opcHorario = 1;
 var arrHorarios = [];
 var fechaHorario;
 const MAX_OPC = 5;
-const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
+const HTML_MATERIA = '<td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td><td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>';
 var html_horario = (num) =>{
   return `<h4>Horario `+num+`</h4>
     <table class="opc-horario">
       <thead>
         <th>Materia</th>
-        <th>Código</th>
         <th>NRC</th>
       </thead>
       <tbody id="tb`+num+`" class="cuerpo">
         <tr>
           <td><input type="text" name="materia" placeholder="Ingresa el nombre" class="materia"></td>
-          <td><input type="text" name="código" placeholder="Ingresa el código" class="codigo"></td>
           <td><input type="number" name="NRC" placeholder="Ingresa el NRC" class="nrc"></td>
         </tr>
       </tbody>
@@ -24,7 +22,7 @@ var html_horario = (num) =>{
       <button type="button" name="Añadir materia" class="add-m" value="tb`+num+`"><i class="fas fa-plus"></i>Añadir Materia</button>
       <button type="button" name="Quitar última" class="remove-m" value="tb`+num+`"><i class="fas fa-eraser"></i>Quitar Materia</button>
     </div>`;};
-var html_busqueda = (prefijo, nrc, cap, disp) => {
+var html_busqueda = (nrc, cap, disp) => {
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
   if(isNaN(porc) || (cap == 0 && disp == 0))
@@ -38,14 +36,12 @@ var html_busqueda = (prefijo, nrc, cap, disp) => {
 
   return `<table class="tabla-busqueda">
       <thead>
-        <th>Carrera</th>
         <th>NRC</th>
         <th>Capacidad</th>
         <th>Disponible</th>
       </thead>
       <tbody>
         <tr>
-          <td>`+prefijo+`</td>
           <td>`+nrc+`</td>
           <td>`+cap+`</td>
           <td><div class="general `+color+`">`+disp+`</div></td>
@@ -59,7 +55,6 @@ var html_cupos = (num) =>{
   <table class="tabla-busqueda">
     <thead>
       <th>Nombre</th>
-      <th>Carrera</th>
       <th>NRC</th>
       <th>Capacidad</th>
       <th>Disponible</th>
@@ -67,7 +62,7 @@ var html_cupos = (num) =>{
     <tbody id="tbc`+num+`" class="cuerpo"></tbody>
   </table>`;
 };
-var html_fila = (name, pre, nrc, cap, disp)=>{
+var html_fila = (name, nrc, cap, disp)=>{
   let color = "";
   let porc = (parseInt(disp))/(parseInt(cap));
   if(isNaN(porc) || (cap == 0 && disp == 0))
@@ -79,7 +74,6 @@ var html_fila = (name, pre, nrc, cap, disp)=>{
   else if(porc >= 0.5)
     color = "verde";
   return `<td>`+name+`</td>
-    <td>`+pre+`</td>
     <td>`+nrc+`</td>
     <td>`+cap+`</td>
     <td><div class="general `+color+`">`+disp+`</div></td>`;
@@ -296,7 +290,7 @@ function guardarHorarios()
             buscado = tabla.children[1].querySelector("#tbc"+numHorario);
             console.log("DENTRO MAT");
             let row = document.createElement("tr");
-            row.innerHTML = html_fila(ma.nombre, ma.prefijo, ma.codigo, ma.capacidad, ma.disponible);
+            row.innerHTML = html_fila(ma.nombre, ma.codigo, ma.capacidad, ma.disponible);
             console.log(1);
             
             buscado.appendChild(row);         
@@ -388,7 +382,7 @@ document.addEventListener("click", (e) => {
       else
       {
         console.log("Error obteniendo horario: "+chrome.runtime.lastError.message);
-        alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no haya guardado uno previamente.");
+        alertar("error", "Ocurrió un error al obtener el último horario :(<br>Puede que no hayas guardado uno previamente.");
       }
     });  
   }
@@ -396,7 +390,6 @@ document.addEventListener("click", (e) => {
   {
     if(allFilled())
     {
-      var prefijo = document.getElementById("pr").value.trim();
       var busqueda = document.getElementById("busqueda").value.trim();
       var buscado = document.querySelector(".content");
       var carta = document.querySelector(".card.margin-top");
@@ -413,7 +406,7 @@ document.addEventListener("click", (e) => {
       temp.innerText = "El resultado de la búsqueda aparecerá enseguida...";
       buscado.appendChild(temp);
 
-      let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+(prefijo.toUpperCase())+"&nrc="+busqueda;
+      let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?nrc="+busqueda;
       
       fetch(dir)
       .then( response => response.text())
@@ -424,14 +417,7 @@ document.addEventListener("click", (e) => {
           buscado.removeChild(espera);
         }, 700);
     
-        if(rta == 'prefijo incorrecto')
-        {
-          let search = document.createElement("div");
-          search.className = "card margin-top animated fadeInRight";
-          search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto</p>";
-          buscado.appendChild(search);
-        }
-        else if(rta.includes('["'))
+        if(rta.includes('["'))
         {
           var bus = rta.split(",")[0].split('"')[1];
           var cant = rta.split(",")[1].split('"')[1];
@@ -446,7 +432,7 @@ document.addEventListener("click", (e) => {
         {
           let search = document.createElement("div");
           search.className = "card margin-top animated fadeInRight";
-          search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p>";
+          search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> "+rta+"</p>";
           buscado.appendChild(search);
         }
       })
@@ -525,11 +511,9 @@ document.addEventListener("click", (e) => {
           let campos = m.children;
 
           let nom = campos[0].firstChild.value;
-          let pre = campos[1].firstChild.value;
           let cod = campos[2].firstChild.value;
           var oMateria = {
             nombre: nom,
-            prefijo: pre,
             codigo: cod,
             capacidad: "-",
             disponible: "-"
@@ -581,8 +565,7 @@ document.addEventListener("click", (e) => {
           tabla.innerHTML = html_cupos(numHorario);
           for(let ma of ho.materias)
           {
-            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
-            console.log(dir);
+            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?nrc="+(ma.codigo);
             
             let buscado = null;
             buscado = tabla.children[1].querySelector("#tbc"+numHorario);
@@ -590,20 +573,14 @@ document.addEventListener("click", (e) => {
             fetch(dir)
             .then(response => response.text())
             .then( rta =>{
-              if(rta == 'prefijo incorrecto')
-              {
-                let row = document.createElement("tr");
-                row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
-                buscado.appendChild(row);
-              }
-              else if(rta.includes('["'))
+              if(rta.includes('["'))
               {
                 let bus = rta.split(",")[0].split('"')[1];
                 let cant = rta.split(",")[1].split('"')[1];
                 let disp = rta.split(",")[2].split('"')[1];
                 
                 let row = document.createElement("tr");
-                row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+                row.innerHTML = html_fila(ma.nombre, bus, cant, disp);
                 
                 ma.capacidad = cant;
                 ma.disponible = disp;
@@ -612,7 +589,7 @@ document.addEventListener("click", (e) => {
               else
               {
                 let row = document.createElement("tr");
-                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> "+rta+"</p></td>";
                 buscado.appendChild(row);
               }
             })
@@ -700,7 +677,7 @@ document.addEventListener("click", (e) => {
           tabla.innerHTML = html_cupos(numHorario);
           for(let ma of ho.materias)
           {
-            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?prefix="+((ma.prefijo.split("-")[0]).toUpperCase())+"&nrc="+(ma.codigo);
+            let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?nrc="+(ma.codigo);
             console.log(dir);
             
             let buscado = null;
@@ -709,20 +686,14 @@ document.addEventListener("click", (e) => {
             fetch(dir)
             .then(response => response.text())
             .then( rta =>{
-              if(rta == 'prefijo incorrecto')
-              {
-                let row = document.createElement("tr");
-                row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> prefijo o NRC incorrecto de materia: "+ma.prefijo.toUpperCase()+" con NRC: "+ma.codigo+"</p></td>";
-                buscado.appendChild(row);
-              }
-              else if(rta.includes('["'))
+              if(rta.includes('["'))
               {
                 let bus = rta.split(",")[0].split('"')[1];
                 let cant = rta.split(",")[1].split('"')[1];
                 let disp = rta.split(",")[2].split('"')[1];
                 
                 let row = document.createElement("tr");
-                row.innerHTML = html_fila(ma.nombre, ma.prefijo, bus, cant, disp);
+                row.innerHTML = html_fila(ma.nombre, bus, cant, disp);
                 
                 ma.capacidad = cant;
                 ma.disponible = disp;
@@ -731,7 +702,7 @@ document.addEventListener("click", (e) => {
               else
               {
                 let row = document.createElement("tr");
-                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> Esto se recibió: "+rta+"</p></td>";
+                row.innerHTML = "<td colspan='5' style='height:170px;'><p class='welcome'><strong>Error :(</strong> -> "+rta+"</p></td>";
                 buscado.appendChild(row);
               }
             })
@@ -801,18 +772,9 @@ document.addEventListener("click", (e) => {
 //COSAS PARA QUE EL ENTER SIRVA EN LA BUSQUEDA.
 if(location.href.includes("search.html"))
 {
-  var input = document.getElementById("pr");
   var input2 = document.getElementById("busqueda");
+  
   // Execute a function when the user releases a key on the keyboard
-  input.addEventListener("keyup", function(event) {
-    // Cancel the default action, if needed
-    event.preventDefault();
-    // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
-      // Trigger the button element with a click
-      document.getElementById("bus-act").click();
-    }
-  }); 
   input2.addEventListener("keyup", function(event) {
     // Cancel the default action, if needed
     event.preventDefault();
