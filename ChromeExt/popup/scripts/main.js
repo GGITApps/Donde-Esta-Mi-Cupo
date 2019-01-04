@@ -511,7 +511,7 @@ document.addEventListener("click", (e) => {
           let campos = m.children;
 
           let nom = campos[0].firstChild.value;
-          let cod = campos[2].firstChild.value;
+          let cod = campos[1].firstChild.value;
           var oMateria = {
             nombre: nom,
             codigo: cod,
