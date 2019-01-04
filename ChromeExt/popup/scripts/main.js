@@ -425,7 +425,7 @@ document.addEventListener("click", (e) => {
     
           let search = document.createElement("div");
           search.className = "card margin-top animated fadeInRight";
-          search.innerHTML = html_busqueda(prefijo, bus, cant, disp);
+          search.innerHTML = html_busqueda(bus, cant, disp);
           buscado.appendChild(search);
         }
         else
@@ -773,7 +773,7 @@ document.addEventListener("click", (e) => {
 if(location.href.includes("search.html"))
 {
   var input2 = document.getElementById("busqueda");
-  
+
   // Execute a function when the user releases a key on the keyboard
   input2.addEventListener("keyup", function(event) {
     // Cancel the default action, if needed
