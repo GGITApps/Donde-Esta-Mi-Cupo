@@ -291,10 +291,8 @@ function guardarHorarios()
             console.log("DENTRO MAT");
             let row = document.createElement("tr");
             row.innerHTML = html_fila(ma.nombre, ma.codigo, ma.capacidad, ma.disponible);
-            console.log(1);
             
             buscado.appendChild(row);         
-            console.log(2);
           } 
           /* content.appendChild(tabla); */
           tablas.push(tabla);
@@ -543,8 +541,21 @@ document.addEventListener("click", (e) => {
 
       }, 600);
 
+      //NUEVAS COSAS !!!!!
+      let content = document.querySelector(".content");
+      let temp = document.createElement("div");
+      temp.className = "card margin-top bu animated fadeInRight";
+      temp.innerText = "Espera que estamos procesando tus horarios ;) ...";
+      content.appendChild(temp);
+
       setTimeout(()=>{
         let content1 = document.querySelector(".content");
+        //NUEVAS COSAS !!!!!
+        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+        changeAnimationCards([espera]);
+        setTimeout(()=>{
+          content1.removeChild(espera);
+        }, 700);
         let nueva = document.createElement("div");
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Aquí Están !</h3>
@@ -598,7 +609,7 @@ document.addEventListener("click", (e) => {
               row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
               buscado.appendChild(row);
             });
-            sleep(800);
+            //AQUI YACÍA EL SLEEP 
           } 
           /*content.appendChild(tabla);*/
           tablas.push(tabla);
@@ -612,7 +623,7 @@ document.addEventListener("click", (e) => {
             console.log(tablas[i].innerHTML);
             contentFin.appendChild(tablas[i]);
           }
-        }, 800);
+        }, 300);
 
         fechaHorario = new Date();
 
@@ -626,9 +637,9 @@ document.addEventListener("click", (e) => {
             save.classList.remove("zoomIn");
             save.classList.remove("animated");
           }, 800);
-        }, 4000);
+        }, 2500);
 
-      }, 1000);
+      }, 2700);
     }
   }
   else if(e.target.classList.contains("refresh"))
@@ -655,8 +666,21 @@ document.addEventListener("click", (e) => {
 
       }, 600);
 
+      //NUEVAS COSAS !!!!!
+      let content = document.querySelector(".content");
+      let temp = document.createElement("div");
+      temp.className = "card margin-top bu animated fadeInRight";
+      temp.innerText = "Espera que estamos procesando tus horarios ;) ...";
+      content.appendChild(temp);
+
       setTimeout(()=>{
         let content1 = document.querySelector(".content");
+        //NUEVAS COSAS !!!!!
+        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+        changeAnimationCards([espera]);
+        setTimeout(()=>{
+          content1.removeChild(espera);
+        }, 700);
         let nueva = document.createElement("div");
         nueva.className = "card animated fadeInRight";
         nueva.innerHTML = `<h3>¡ Recién Actualizados !</h3>
@@ -678,7 +702,6 @@ document.addEventListener("click", (e) => {
           for(let ma of ho.materias)
           {
             let dir = "https://donde-estan-mis-cupos-uniandes.herokuapp.com/?nrc="+(ma.codigo);
-            console.log(dir);
             
             let buscado = null;
             buscado = tabla.children[1].querySelector("#tbc"+numHorario);
@@ -711,7 +734,7 @@ document.addEventListener("click", (e) => {
               row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
               buscado.appendChild(row);
             });
-            sleep(800);
+            //AQUÍ YACÍA EL SLEEP
           } 
           /*content.appendChild(tabla);*/
           tablas.push(tabla);
@@ -722,13 +745,12 @@ document.addEventListener("click", (e) => {
           let contentFin = document.querySelector(".content");
           for(let i = 0; i < tablas.length; i++)
           {
-            console.log(tablas[i].innerHTML);
             contentFin.appendChild(tablas[i]);
           }
         }, 800);
         
         fechaHorario = new Date();
-      }, 1000);
+      }, 2700);
     }
     else
     {
