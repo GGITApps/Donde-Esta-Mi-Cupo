@@ -17,7 +17,8 @@
     ],
     "permissions": [
       "activeTab",
-      "storage"
+      "storage",
+      "tabs"
     ],
     "manifest_version": 2
   }
