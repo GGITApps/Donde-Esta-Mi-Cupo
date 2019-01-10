@@ -435,9 +435,14 @@ document.addEventListener("click", (e) => {
         }
       })
       .catch(err => {
+        let espera = document.querySelector(".card.margin-top.bu.animated.fadeInRight");
+        changeAnimationCards([espera]);
+        setTimeout(()=>{
+          buscado.removeChild(espera);
+        }, 700);
         let search = document.createElement("div");
         search.className = "card margin-top animated fadeInRight";
-        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p>";
+        search.innerHTML = "<p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: <a href=https://m.facebook.com/groups/165224363540859?view=permalink&id=2160184610711481>Ingresa para saber más...</a></p>";
         buscado.appendChild(search);
       });
     }
@@ -606,7 +611,7 @@ document.addEventListener("click", (e) => {
             })
             .catch( err =>{
               let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: <a href=https://m.facebook.com/groups/165224363540859?view=permalink&id=2160184610711481>Ingresa para saber más...</a></p></td>";
               buscado.appendChild(row);
             });
             //AQUI YACÍA EL SLEEP 
@@ -731,7 +736,7 @@ document.addEventListener("click", (e) => {
             })
             .catch( err =>{
               let row = document.createElement("tr");
-              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: "+err.message+"</p></td>";
+              row.innerHTML = "<td colspan='5'><p class='welcome'><strong>Error :(</strong> -> No se pudo realizar la petición: <a href=https://m.facebook.com/groups/165224363540859?view=permalink&id=2160184610711481>Ingresa para saber más...</a></p></td>";
               buscado.appendChild(row);
             });
             //AQUÍ YACÍA EL SLEEP
